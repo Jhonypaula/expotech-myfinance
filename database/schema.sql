@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS my_finance;
+
 CREATE DATABASE my_finance;
 
 USE my_finance;

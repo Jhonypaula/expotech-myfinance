@@ -12,14 +12,38 @@ def cadastrar_usuario ():
 
     if not validar_campo_vazio(nome_usuario):
         print('Nome invalido')
+        
+        cursor.close()
+        conexao.close()
+        
         return
     
     if not validar_email(email_usuario):
         print('Email invalido')
+        
+        cursor.close()
+        conexao.close()
+        
         return
     
     if not validar_senha(senha_usuario):
         print('Senha invalida')
+        
+        cursor.close()
+        conexao.close()
+        
+        return
+
+    cursor.execute("SELECT id_usuarios FROM tbl_usuarios WHERE email_usuarios = %s", (email_usuario,))
+    
+    usuario_existente = cursor.fetchone()
+    
+    if usuario_existente:
+        print('Email ja cadastrado')
+        
+        cursor.close()
+        conexao.close()
+        
         return
 
     senha_hash = hash_senha(senha_usuario)
@@ -31,11 +55,23 @@ def cadastrar_usuario ():
 
     cursor.execute(sql, valores)  
     conexao.commit()
+    
+    cursor.execute(
+        """
+        SELECT id_usuarios, nome_usuarios, email_usuarios 
+        FROM tbl_usuarios WHERE email_usuarios = %s
+        """, 
+        (email_usuario,)
+    )
+    
+    usuario_cadastrado = cursor.fetchone()
 
+    print('Usuario cadastrado com sucesso!')
+    
     cursor.close()
     conexao.close()
 
-    print('Usuario cadastrado com sucesso!')
+    return usuario_cadastrado
 
 def login_usuario ():
 
@@ -63,7 +99,6 @@ def login_usuario ():
     conexao.close()
 
     if usuario:
-        print(f"Bem-vindo! {usuario[1]}")
         return usuario
     else:
         print("Email ou senha incorretos")
