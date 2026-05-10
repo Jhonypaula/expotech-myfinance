@@ -45,7 +45,7 @@ def criar_conta(usuario_id):
         return None
     
     if saldo_inicial > MAX_SALDO:
-        print(f"Voce nao e o ELON MUSK!! O saldo so pode ser feito ate '{MAX_SALDO}'")
+        print(f"Voce nao e o ELON MUSK!! O saldo incial nao pode ser maior que {MAX_SALDO}")
         
         return
     
