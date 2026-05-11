@@ -20,7 +20,7 @@ def criar_conta(usuario_id):
     try:
         saldo_inicial = float(saldo_inicial_str)
     except ValueError:
-        print("Saldo incial invalido! Por favor, insira um numero valido.")
+        print("\nSaldo incial invalido! Por favor, insira um numero valido.")
         
         return
     tipo_conta = input("Digite o tipo de conta dentre elas (corrente, poupanca, carteira): ")
@@ -30,22 +30,22 @@ def criar_conta(usuario_id):
     contas_validas = ['corrente', 'poupanca', 'carteira']
     
     if not nome_conta:
-        print("Nome da conta nao pode ser vazio!")
+        print("\nNome da conta nao pode ser vazio!")
         
         return None
     
     if tipo_conta not in contas_validas:
-        print("Tipo de conta invalida! Escolha uma entre: 'corrente', 'poupanca' ou 'carteira'.")
+        print("\nTipo de conta invalida! Escolha uma entre: 'corrente', 'poupanca' ou 'carteira'.")
         
         return None
     
     if not isinstance(saldo_inicial,(int,float)) or saldo_inicial < 0:
-        print("Saldo incial deve ser um numero positivo.")
+        print("\nSaldo incial deve ser um numero positivo.")
         
         return None
     
     if saldo_inicial > MAX_SALDO:
-        print(f"Voce nao e o ELON MUSK!! O saldo incial nao pode ser maior que {MAX_SALDO}")
+        print(f"\nVoce nao e o ELON MUSK!! O saldo incial nao pode ser maior que {MAX_SALDO}")
         
         return
     
@@ -136,9 +136,9 @@ def main():
                     criar_conta(usuario_logado[0])
                     
                 elif opcao_contas == "2":
-                    listar_conta()
+                    listar_conta(usuario_logado[0])
                     
-                    print('Listar contas')
+                    
                 elif opcao_contas == "3":
                     editar_conta()
                     

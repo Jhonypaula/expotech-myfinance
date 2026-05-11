@@ -1,7 +1,6 @@
 from database.connection import conectar_banco
 
 def cadastrar_conta(usuario_id, nome_conta, tipo_conta, saldo_inicial):
-    contas_validas = ['corrente', 'poupanca', 'carteira']
     
     conexao = conectar_banco()
     cursor = conexao.cursor()
@@ -24,9 +23,28 @@ def cadastrar_conta(usuario_id, nome_conta, tipo_conta, saldo_inicial):
     conexao.close()
     
     return nova_conta
-def listar_conta():
-    pass
-
+def listar_conta(usuario_id):
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    
+    cursor.execute("""
+        SELECT nome_contas, tipo_contas, saldo_contas 
+        FROM tbl_contas 
+        WHERE usuario_id = %s
+    """, (usuario_id,))
+    
+    contas = cursor.fetchall()
+    
+    if contas:
+        print("\n==== SUAS CONTAS ====")
+        
+        for conta in contas:
+            print(f"Nome: {conta[0]} Tipo: {conta[1]} Saldo: {conta[2]:.2f} BRL")
+    else:
+        print("Voce nao tem contas cadastrada.")
+    
+    cursor.close()
+    conexao.close()
 def editar_conta():
     pass
 
