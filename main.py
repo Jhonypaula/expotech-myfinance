@@ -1,9 +1,61 @@
-from services.auth_services import cadastrar_usuario, login_usuario
-from services.conta_services import cadastrar_conta, listar_conta, editar_conta, excluir_conta
+from services.auth_services import (
+    cadastrar_usuario_service,
+    login_usuario_service
+    )
+from services.conta_services import (
+    cadastrar_conta_service,
+    listar_contas_service
+)
 
 usuario_logado = None
 
 
+def tela_cadastro():
+    global usuario_logado
+    
+    nome_usuario  = input('Digite seu nome para cadastrar: ')
+    email_usuario   = input('Digite seu email  para cadastrar: ')
+    senha_usuario   = input('Digite sua senha para cadastrar: ')
+    
+    cadastro = cadastrar_usuario_service(
+        nome_usuario, 
+        email_usuario, 
+        senha_usuario
+    )
+
+    if cadastro:
+        usuario_logado = cadastro
+
+        print('Cadastro realizado com sucesso!')
+        
+        return usuario_logado
+    else:
+        print('Erro ao cadastrar usuario!')
+        
+        return None
+
+def tela_login():
+    global usuario_logado
+    
+    email_usuario   = input('Digite seu email  para login: ')
+    senha_usuario   = input('Digite sua senha para login: ')
+    
+    usuario = login_usuario_service(
+        email_usuario, 
+        senha_usuario
+    )
+
+    if usuario:
+        usuario_logado = usuario
+
+        print('Login realizado com sucesso!')
+
+        return usuario_logado
+    else:
+        print('Erro ao fazer login!')
+        
+        return None
+    
 def logout():
     global usuario_logado
 
@@ -12,50 +64,51 @@ def logout():
     print('Logout realizado com sucesso!')
 
 def criar_conta(usuario_id):
-    nome_conta = input("Digite o nome da conta (ex: NuBank): ")
-    saldo_inicial_str = input("Digite o saldo incial da conta: ")
     
-    saldo_inicial_str = saldo_inicial_str.replace(',', '.')
+    nome_conta = input('Digite o nome da conta: ')
     
-    try:
-        saldo_inicial = float(saldo_inicial_str)
-    except ValueError:
-        print("\nSaldo incial invalido! Por favor, insira um numero valido.")
-        
-        return
-    tipo_conta = input("Digite o tipo de conta dentre elas (corrente, poupanca, carteira): ")
+    tipo_conta = input('Digite o tipo da conta (corrente, poupança, carteira): ')
     
-    MAX_SALDO = 99999999.99
-    
-    contas_validas = ['corrente', 'poupanca', 'carteira']
-    
-    if not nome_conta:
-        print("\nNome da conta nao pode ser vazio!")
-        
-        return None
-    
-    if tipo_conta not in contas_validas:
-        print("\nTipo de conta invalida! Escolha uma entre: 'corrente', 'poupanca' ou 'carteira'.")
-        
-        return None
-    
-    if not isinstance(saldo_inicial,(int,float)) or saldo_inicial < 0:
-        print("\nSaldo incial deve ser um numero positivo.")
-        
-        return None
-    
-    if saldo_inicial > MAX_SALDO:
-        print(f"\nVoce nao e o ELON MUSK!! O saldo incial nao pode ser maior que {MAX_SALDO}")
-        
-        return
-    
-    conta_criada = cadastrar_conta(usuario_id, nome_conta, tipo_conta, saldo_inicial)
-    
+    saldo_inicial_str = input('Digite o saldo inicial da conta: ')
+
+    conta_criada = cadastrar_conta_service(
+        usuario_id,
+        nome_conta,
+        tipo_conta,
+        saldo_inicial_str
+    )
+
     if conta_criada:
-        print(f"\nConta '{nome_conta}' criada com sucesso!")
+        print('Conta criada com sucesso!')
         
+        return conta_criada
     else:
-        print("\nErro ao criar a conta.")
+        print('Erro ao criar conta!')
+        
+        return None
+
+def listar_contas(usuario_id):
+    
+    contas = listar_contas_service(usuario_id)
+
+    if contas:
+        print('\n=== SUAS CONTAS ===')
+        
+        for conta in contas:
+            
+            id_conta = conta[0]
+            nome_conta = conta[1]
+            tipo_conta = conta[2]
+            saldo_conta = conta[3]
+            
+            print(f"ID: {id_conta:<5} | Nome: {nome_conta:<15} | Tipo: {tipo_conta:<10} | Saldo: {saldo_conta:.2f}")
+            
+        return contas
+    else:
+        print('Nenhuma conta encontrada!')
+        
+        return None
+
 def menu_deslogado():
 
     print('\n==== MY FINANCE ====')
@@ -64,7 +117,6 @@ def menu_deslogado():
     print('3 - Sair')
 
     return input('Escolha: ')
-
 
 def menu_logado():
 
@@ -83,11 +135,11 @@ def menu_contas():
     print("4 - Excluir conta")
     print("5 - Voltar")
     
-    return input('Escollha: ')
+    return input('Escolha: ')
 
 def main():
 
-    global usuario_logado
+    # global usuario_logado
 
     while True:
 
@@ -97,22 +149,10 @@ def main():
             opcao = menu_deslogado()
 
             if opcao == "1":
-
-                usuario = login_usuario()
-
-                if usuario:
-                    usuario_logado = usuario
-
-                    print('Login realizado com sucesso!')
+                tela_login()
 
             elif opcao == "2":
-
-                cadastro = cadastrar_usuario()
-
-                if cadastro:
-                    usuario_logado = cadastro
-
-                    print('Cadastro realizado com sucesso!')
+                tela_cadastro()
 
             elif opcao == "3":
 
@@ -136,15 +176,15 @@ def main():
                     criar_conta(usuario_logado[0])
                     
                 elif opcao_contas == "2":
-                    listar_conta(usuario_logado[0])
+                    listar_contas(usuario_logado[0])
                     
                     
                 elif opcao_contas == "3":
-                    editar_conta()
+                    # editar_conta()
                     
                     print('Editar conta')
                 elif opcao_contas == "4":
-                    excluir_conta()
+                    # excluir_conta()
                     
                     print('Excluir conta')
                 elif opcao_contas == "5":
