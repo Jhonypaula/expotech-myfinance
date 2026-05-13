@@ -143,3 +143,27 @@ def editar_conta_repository(
     
     cursor.close()
     conexao.close()
+    
+def excluir_conta_repository(
+    usuario_id,
+    id_conta
+):
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    
+    sql = """
+        DELETE FROM tbl_contas
+        WHERE usuario_id = %s
+        AND id_contas = %s
+    """
+    
+    valores = (
+        usuario_id,
+        id_conta
+    )
+    
+    cursor.execute(sql, valores)
+    conexao.commit()
+    
+    cursor.close()
+    conexao.close()

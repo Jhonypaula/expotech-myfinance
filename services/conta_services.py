@@ -3,7 +3,8 @@ from repository.conta_repository import (
     buscar_conta_por_nome,
     listar_contas_repository,
     buscar_conta_por_id,
-    editar_conta_repository
+    editar_conta_repository,
+    excluir_conta_repository
 )
 
 from utils.validators import validar_campo_vazio
@@ -116,6 +117,27 @@ def editar_conta_service(
         id_conta,
         novo_nome,
         novo_tipo
+    )
+    
+    return True
+
+def excluir_conta_service(
+    usuario_id,
+    id_conta
+):
+    
+    conta_existente = buscar_conta_por_id(
+        usuario_id,
+        id_conta
+    )
+    
+    if not conta_existente:
+        print("\nConta nao encontrada ou nao pertence ao usuario")
+        return None
+    
+    excluir_conta_repository(
+        usuario_id,
+        id_conta
     )
     
     return True

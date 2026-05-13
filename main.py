@@ -5,7 +5,8 @@ from services.auth_services import (
 from services.conta_services import (
     cadastrar_conta_service,
     listar_contas_service,
-    editar_conta_service
+    editar_conta_service,
+    excluir_conta_service
 )
 
 usuario_logado = None
@@ -138,6 +139,35 @@ def editar_conta(usuario_id):
     else:
         print("\nErro ao editar a conta. ")
 
+def excluir_conta(usuario_id):
+    
+    listar_contas(usuario_id)
+    
+    try:
+        id_conta = int(input("\nDigite o ID da conta que deseja excluir: "))
+    except ValueError:
+        print("\nID invalido!")
+        return None
+    
+    confirmacao = input("Tem certeza que deseja excluir esta conta? (s/n): ").lower()
+    
+    if confirmacao != "s":
+        print("\nExclusao cancelada.")
+        return None
+        
+    conta_excluida = excluir_conta_service(
+        usuario_id,
+        id_conta
+    )
+    
+    if conta_excluida:
+        print("\nConta excluida com sucesso! ")
+        return True
+    
+    else:
+        print("\nErro ao excluir conta.")
+        return None
+
 def menu_deslogado():
 
     print('\n==== MY FINANCE ====')
@@ -212,8 +242,8 @@ def main():
                     editar_conta(usuario_logado[0])
                     
                 elif opcao_contas == "4":
-                    # excluir_conta()
-                    ...
+                    excluir_conta(usuario_logado[0])
+                    
                 elif opcao_contas == "5":
                     continue
             elif opcao == "2":
