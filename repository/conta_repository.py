@@ -83,3 +83,63 @@ def listar_contas_repository(usuario_id):
     conexao.close()
     
     return contas
+
+def buscar_conta_por_id(
+    usuario_id,
+    id_conta
+):
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    
+    sql = """
+        SELECT id_contas
+        FROM tbl_contas
+        WHERE usuario_id = %s
+        AND id_contas = %s
+    """
+    
+    valores = (
+        usuario_id, 
+        id_conta
+    )
+    
+    cursor.execute(sql, valores)
+    
+    conta = cursor.fetchone()
+    
+    cursor.close()
+    conexao.close()
+    
+    return conta
+    
+def editar_conta_repository(
+    usuario_id,
+    id_conta,
+    novo_nome,
+    novo_tipo
+):
+    
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    
+    sql = """
+        UPDATE tbl_contas
+        SET nome_contas = %s,
+            tipo_contas = %s
+        WHERE usuario_id = %s
+        AND id_contas = %s
+    """
+    
+    valores = (
+        novo_nome,
+        novo_tipo,
+        usuario_id,
+        id_conta
+    )
+    
+    cursor.execute(sql, valores)
+    
+    conexao.commit()
+    
+    cursor.close()
+    conexao.close()

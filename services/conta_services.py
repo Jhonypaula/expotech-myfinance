@@ -1,8 +1,12 @@
 from repository.conta_repository import (
     criar_conta_repository,
     buscar_conta_por_nome,
-    listar_contas_repository
+    listar_contas_repository,
+    buscar_conta_por_id,
+    editar_conta_repository
 )
+
+from utils.validators import validar_campo_vazio
 
 def cadastrar_conta_service(
     usuario_id,
@@ -13,13 +17,13 @@ def cadastrar_conta_service(
     
     contas_validas = [
         'corrente', 
-        'poupança', 
+        'poupanca', 
         'carteira'
     ]
     
     MAX_SALDO = 99999999.99
     
-    if not nome_conta:
+    if not validar_campo_vazio(nome_conta):
         print('\nNome da conta é obrigatório')
         
         return None
@@ -77,3 +81,41 @@ def listar_contas_service(usuario_id):
     contas = listar_contas_repository(usuario_id)
     
     return contas
+
+def editar_conta_service(
+    usuario_id,
+    id_conta,
+    novo_nome,
+    novo_tipo
+):
+    conta_validas = [
+        'corrente',
+        'poupanca',
+        'carteira'
+    ]
+    
+    if not validar_campo_vazio(novo_nome):
+        print("\nNome da conta obrigatorio!")
+        return None
+    
+    if novo_tipo not in conta_validas:
+        print("\nTipo de conta invalido!")
+        return None
+    
+    conta_existente = buscar_conta_por_id(
+        usuario_id,
+        id_conta
+    )
+    
+    if not conta_existente:
+        print("\nConta nao encontrada ou nao pertence ao usuario")
+        return None
+
+    editar_conta_repository(
+        usuario_id,
+        id_conta,
+        novo_nome,
+        novo_tipo
+    )
+    
+    return True

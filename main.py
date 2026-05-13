@@ -4,7 +4,8 @@ from services.auth_services import (
     )
 from services.conta_services import (
     cadastrar_conta_service,
-    listar_contas_service
+    listar_contas_service,
+    editar_conta_service
 )
 
 usuario_logado = None
@@ -67,7 +68,7 @@ def criar_conta(usuario_id):
     
     nome_conta = input('Digite o nome da conta: ')
     
-    tipo_conta = input('Digite o tipo da conta (corrente, poupança, carteira): ')
+    tipo_conta = input('Digite o tipo da conta (corrente, poupanca, carteira): ')
     
     saldo_inicial_str = input('Digite o saldo inicial da conta: ')
 
@@ -108,6 +109,34 @@ def listar_contas(usuario_id):
         print('Nenhuma conta encontrada!')
         
         return None
+
+def editar_conta(usuario_id):
+    
+    listar_contas(usuario_id)
+    
+    try:
+        id_conta = int(input("\nDigite o ID da conta: "))
+        
+    except ValueError:
+        print("\nID invalido!")
+        return None
+    
+    novo_nome = input("Digite o novo nome da conta: ")
+    
+    novo_tipo = input("Digite o novo tipo da conta (corrente, poupanca, carteira): ")
+    
+    conta_editada = editar_conta_service(
+        usuario_id,
+        id_conta,
+        novo_nome,
+        novo_tipo
+    )
+    
+    if conta_editada:
+        print("\nConta editada com sucesso!")
+        
+    else:
+        print("\nErro ao editar a conta. ")
 
 def menu_deslogado():
 
@@ -180,13 +209,11 @@ def main():
                     
                     
                 elif opcao_contas == "3":
-                    # editar_conta()
+                    editar_conta(usuario_logado[0])
                     
-                    print('Editar conta')
                 elif opcao_contas == "4":
                     # excluir_conta()
-                    
-                    print('Excluir conta')
+                    ...
                 elif opcao_contas == "5":
                     continue
             elif opcao == "2":
