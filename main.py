@@ -1,7 +1,7 @@
 from services.auth_services import (
     cadastrar_usuario_service,
     login_usuario_service
-    )
+)
 from services.conta_services import (
     cadastrar_conta_service,
     listar_contas_service,
@@ -141,6 +141,8 @@ def editar_conta(usuario_id):
 
 def excluir_conta(usuario_id):
     
+    print("====== EXCLUIR CONTA =====")
+    
     listar_contas(usuario_id)
     
     try:
@@ -181,8 +183,9 @@ def menu_logado():
 
     print(f"\nBem-vindo, {usuario_logado[1]}!")
     print("1 - Contas")
-    print("2 - Logout")
-    print("3 - Sair")
+    print("2 - Transacoes")
+    print("3 - Logout")
+    print("4 - Sair")
 
     return input('Escolha: ')
 
@@ -195,6 +198,17 @@ def menu_contas():
     print("5 - Voltar")
     
     return input('Escolha: ')
+
+def menu_transacoes():
+    
+    print("\n===== TRANSACOES =====")
+    print("1 - Criar transacao")
+    print("2 - Listar transacoes")
+    print("3 - Editar transacao")
+    print("4 - Excluir transacao")
+    print("5 - Voltar")
+    
+    return input("Escolha: ")
 
 def main():
 
@@ -246,12 +260,31 @@ def main():
                     
                 elif opcao_contas == "5":
                     continue
+                
             elif opcao == "2":
-                logout()
+                opcao_transacoes = menu_transacoes()
+                if opcao_transacoes == "1":
+                    print("Criar transacao")
+                    
+                elif opcao_transacoes == "2":
+                    print("Listar transacoes")
+                
+                elif opcao_transacoes == "3":
+                    print("Editar transacao")
+                
+                elif opcao_transacoes == "4":
+                    print("Excluir transacao")
+                
+                elif opcao_transacoes == "5":
+                    continue
                 
             elif opcao == "3":
-                print('Saindo do sistema . . .')
+                logout()
+            
+            elif opcao == "4":
+                print('Saindo do sistema')
                 break
+            
             else:
                 print('Opcao invalida')
 
