@@ -167,3 +167,48 @@ def excluir_conta_repository(
     
     cursor.close()
     conexao.close()
+
+def atualizar_saldo_repository(
+    id_conta,
+    novo_saldo
+):
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    
+    sql = """
+        UPDATE tbl_contas
+        SET saldo_contas = %s
+        WHERE id_contas = %s
+    """
+    
+    valores = (
+        novo_saldo,
+        id_conta  
+    )
+    
+    cursor.execute(sql, valores)
+    conexao.commit()
+    
+    cursor.close()
+    conexao.close()
+    
+def buscar_saldo_conta_repository(id_conta):
+    
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    
+    sql = """
+        SELECT saldo_contas
+        FROM tbl_contas
+        WHERE id_contas = %s
+    """
+    
+    valores = id_conta,
+    
+    cursor.execute(sql, valores)
+    saldo_atual = cursor.fetchone()
+    
+    cursor.close()
+    conexao.close()
+    
+    return saldo_atual    

@@ -5,8 +5,7 @@ def criar_transacao_repository(
     categorias_id,
     tipo_transacoes,
     valor_transacoes,
-    descricao_transacoes,
-    data_transacao
+    descricao_transacoes
 ):
     conexao = conectar_banco()
     cursor = conexao.cursor()
@@ -14,14 +13,13 @@ def criar_transacao_repository(
     sql = """
         INSERT INTO tbl_transacoes (
             conta_id,
-            categorias_id,
+            categoria_id,
             tipo_transacoes,
             valor_transacoes,
-            descricao_transacoes,
-            data_transacao
+            descricao_transacoes
         ) 
         
-        VALUES (%s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s)
     """
     
     valores = (
@@ -29,8 +27,7 @@ def criar_transacao_repository(
         categorias_id,
         tipo_transacoes,
         valor_transacoes,
-        descricao_transacoes,
-        data_transacao
+        descricao_transacoes
     )
     
     cursor.execute(sql, valores)

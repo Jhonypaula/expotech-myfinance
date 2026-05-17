@@ -46,3 +46,21 @@ CREATE TABLE tbl_transacoes (
 
     FOREIGN KEY (categoria_id) REFERENCES tbl_categorias(id_categorias)
 );
+
+INSERT INTO tbl_categorias (
+    nome_categorias,
+    descricao_categorias
+)
+VALUES
+('Alimentacao', 'Gastos com mercado, restaurantes e comida'),
+('Transporte', 'Uber, gasolina, ônibus e transporte público'),
+('Salario', 'Entradas salariais e pagamentos recebidos'),
+('Lazer', 'Cinema, jogos, streaming e entretenimento'),
+('Saude', 'Farmácia, consultas e exames'),
+('Educacao', 'Cursos, faculdade e materiais de estudo'),
+('Moradia', 'Aluguel, condomínio e contas da casa'),
+('Investimentos', 'Aplicações financeiras e investimentos'),
+('Compras', 'Roupas, eletrônicos e compras em geral'),
+('Assinaturas', 'Netflix, Spotify e serviços recorrentes'),
+('Transferencias', 'PIX, TED e transferências bancárias'),
+('Outros', 'Transações diversas que não se encaixam nas demais categorias');
