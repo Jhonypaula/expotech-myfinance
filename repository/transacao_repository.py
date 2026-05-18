@@ -69,3 +69,58 @@ def listar_transacoes_repository(conta_id):
     conexao.close()
     
     return transacoes
+
+def buscar_transacao_por_id(
+    conta_id,
+    id_transacao
+):
+    
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    
+    sql = """
+        SELECT
+            id_transacoes,
+            tipo_transacoes,
+            valor_transacoes
+        FROM tbl_transacoes
+        WHERE conta_id = %s
+        AND id_transcoes = %s
+    """
+    
+    valores = conta_id, id_transacao
+    
+    cursor.execute(sql, valores)
+    
+    transacao = cursor.fetchone()
+    
+    cursor.close()
+    conexao.close()
+    
+    return transacao
+
+def excluir_transacao_repository(
+    conta_id,
+    id_transacao
+):
+    
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    
+    sql = """
+        DELETE FROM tbl_transacoes
+        WHERE conta_id = %s
+        AND id_transacoes = %s
+    """
+    
+    valores = (
+        conta_id,
+        id_transacao
+    )
+    
+    cursor.execute(sql, valores)
+    
+    conexao.commit()
+    
+    cursor.close()
+    conexao.close()

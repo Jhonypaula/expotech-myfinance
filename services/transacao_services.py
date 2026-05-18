@@ -1,6 +1,8 @@
 from repository.transacao_repository import (
     criar_transacao_repository,
-    listar_transacoes_repository
+    listar_transacoes_repository,
+    buscar_transacao_por_id,
+    excluir_transacao_repository
 )
 from repository.conta_repository import (
     buscar_conta_por_id,
@@ -157,3 +159,55 @@ def listar_transacao_service(
     transacoes = listar_transacoes_repository(conta_id)
     
     return transacoes
+
+def excluir_transacao_service(
+    usuario_id,
+    conta_id,
+    id_transacoes
+):
+    
+    conta_existente = buscar_conta_por_id(
+        usuario_id, 
+        conta_id
+    )
+    
+    if not conta_existente:
+        print("\nConta nao encontrada!")
+        return None
+    
+    transacao_existente = buscar_transacao_por_id(
+        conta_id, 
+        id_transacoes
+    )
+    
+    if not transacao_existente:
+        print("\nTransacao nao encontrada!")
+        
+    tipo_transacao = transacao_existente[1]
+    valor_transacao = transacao_existente[2]
+    
+    saldo_atual = buscar_saldo_conta_repository(conta_id)
+    
+    if not saldo_atual:
+        print("\nErro ao buscar saldo!")
+        return None
+    
+    saldo_atual = float(saldo_atual[0])
+    
+    if tipo_transacao == 'entrada':
+        novo_saldo = saldo_atual - valor_transacao
+    
+    else:
+        novo_saldo = saldo_atual + valor_transacao
+        
+    atualizar_saldo_repository(
+        conta_id,
+        novo_saldo
+    )
+    
+    excluir_transacao_repository(
+        conta_id,
+        id_transacoes
+    )
+    
+    return True
