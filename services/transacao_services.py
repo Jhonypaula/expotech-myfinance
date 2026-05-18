@@ -1,5 +1,6 @@
 from repository.transacao_repository import (
-    criar_transacao_repository
+    criar_transacao_repository,
+    listar_transacoes_repository
 )
 from repository.conta_repository import (
     buscar_conta_por_id,
@@ -61,6 +62,10 @@ def criar_transacao_service(
     
     if not validar_campo_vazio(descricao_transacoes):
         print("\nDescricao obrigatoria!")
+        return None
+    
+    if len(descricao_transacoes) > 15:
+        print("\nDescricao muito longa! Maximo 15")
         return None
     
     # ===============================
@@ -134,4 +139,21 @@ def criar_transacao_service(
     )
     
     return True
-        
+
+def listar_transacao_service(
+    usuario_id,
+    conta_id
+):
+    
+    conta_existente = buscar_conta_por_id(
+        usuario_id, 
+        conta_id
+    )
+    
+    if not conta_existente:
+        print("\nConta nao encontrada ou nao pertence ao usuario")
+        return None 
+    
+    transacoes = listar_transacoes_repository(conta_id)
+    
+    return transacoes

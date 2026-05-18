@@ -9,7 +9,8 @@ from services.conta_services import (
     excluir_conta_service
 )
 from services.transacao_services import (
-    criar_transacao_service
+    criar_transacao_service,
+    listar_transacao_service
 )
 from services.categoria_services import (
     listar_categorias_service
@@ -232,6 +233,37 @@ def criar_transacao(usuario_id):
         print("\nErro ao criar transacao.")
         return None
 
+def listar_transacoes(usuario_id):
+    listar_contas(usuario_id)
+    
+    try:
+        conta_id = int(input("\nDigite o ID da conta: "))
+        
+    except ValueError:
+        print("\nID invalido!")
+        return None
+    
+    transacoes = listar_transacao_service(
+        usuario_id, 
+        conta_id
+    )
+    
+    if transacoes:
+        print("\n===== TRANSACOES =====")
+        
+        for transacao in transacoes:
+            
+            id_transacao = transacao[0]
+            tipo_transacao = transacao[1]
+            valor_transacao = transacao[2]
+            descricao_transacao = transacao[3]
+            categoria_transacao = transacao[4]
+            data = transacao[5].strftime("%d/%m/%Y")
+            
+            print(f"ID: {id_transacao:<5} |  Tipo: {tipo_transacao:<10} | Valor: {valor_transacao:<102.2f} | Categoria: {categoria_transacao:<15} | Desc: {descricao_transacao:<15} | Data: {data}")
+    else:
+        print("\nNenhuma transacao encontrada!")
+
 def menu_deslogado():
 
     print('\n==== MY FINANCE ====')
@@ -266,9 +298,7 @@ def menu_transacoes():
     print("\n===== TRANSACOES =====")
     print("1 - Criar transacao")
     print("2 - Listar transacoes")
-    print("3 - Editar transacao")
-    print("4 - Excluir transacao")
-    print("5 - Voltar")
+    print("3 - Voltar")
     
     return input("\nEscolha: ")
 
@@ -329,15 +359,9 @@ def main():
                     criar_transacao(usuario_logado[0])
                     
                 elif opcao_transacoes == "2":
-                    listar_categorias()
+                    listar_transacoes(usuario_logado[0])
                 
                 elif opcao_transacoes == "3":
-                    print("Editar transacao")
-                
-                elif opcao_transacoes == "4":
-                    print("Excluir transacao")
-                
-                elif opcao_transacoes == "5":
                     continue
                 
             elif opcao == "3":

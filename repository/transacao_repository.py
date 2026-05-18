@@ -37,3 +37,35 @@ def criar_transacao_repository(
     cursor.close()
     conexao.close()
     
+def listar_transacoes_repository(conta_id):
+    
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    
+    sql = """
+        SELECT 
+            t.id_transacoes,
+            t.tipo_transacoes,
+            t.valor_transacoes,
+            t.descricao_transacoes,
+            c.nome_categorias,
+            t.data_transacao
+        FROM tbl_transacoes t
+        
+        INNER JOIN tbl_categorias c
+        ON t.categoria_id = c.id_categorias
+        
+        WHERE t.conta_id = %s
+        
+        ORDER BY t.data_transacao DESC
+    """
+    
+    valores = conta_id,
+    
+    cursor.execute(sql, valores)
+    transacoes = cursor.fetchall()
+    
+    cursor.close()
+    conexao.close()
+    
+    return transacoes
