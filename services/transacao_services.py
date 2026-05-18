@@ -182,9 +182,10 @@ def excluir_transacao_service(
     
     if not transacao_existente:
         print("\nTransacao nao encontrada!")
+        return None
         
     tipo_transacao = transacao_existente[1]
-    valor_transacao = transacao_existente[2]
+    valor_transacao = float(transacao_existente[2])
     
     saldo_atual = buscar_saldo_conta_repository(conta_id)
     

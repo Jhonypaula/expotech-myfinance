@@ -10,7 +10,8 @@ from services.conta_services import (
 )
 from services.transacao_services import (
     criar_transacao_service,
-    listar_transacao_service
+    listar_transacao_service,
+    excluir_transacao_service,
 )
 from services.categoria_services import (
     listar_categorias_service
@@ -233,36 +234,94 @@ def criar_transacao(usuario_id):
         print("\nErro ao criar transacao.")
         return None
 
-def listar_transacoes(usuario_id):
-    listar_contas(usuario_id)
-    
-    try:
-        conta_id = int(input("\nDigite o ID da conta: "))
-        
-    except ValueError:
-        print("\nID invalido!")
-        return None
-    
+def listar_transacoes(
+    usuario_id,
+    conta_id=None
+):
+
+    if conta_id is None:
+
+        listar_contas(usuario_id)
+
+        try:
+            conta_id = int(input("\nDigite o ID da conta: "))
+
+        except ValueError:
+            print("\nID invalido!")
+            return None
+
     transacoes = listar_transacao_service(
-        usuario_id, 
+        usuario_id,
         conta_id
     )
-    
+
     if transacoes:
+
         print("\n===== TRANSACOES =====")
-        
+
         for transacao in transacoes:
-            
+
             id_transacao = transacao[0]
             tipo_transacao = transacao[1]
             valor_transacao = transacao[2]
             descricao_transacao = transacao[3]
             categoria_transacao = transacao[4]
+
             data = transacao[5].strftime("%d/%m/%Y")
-            
-            print(f"ID: {id_transacao:<5} |  Tipo: {tipo_transacao:<10} | Valor: {valor_transacao:<102.2f} | Categoria: {categoria_transacao:<15} | Desc: {descricao_transacao:<15} | Data: {data}")
+
+            print(
+                f"ID: {id_transacao:<5} | "
+                f"Tipo: {tipo_transacao:<10} | "
+                f"Valor: {valor_transacao:<10.2f} | "
+                f"Categoria: {categoria_transacao:<15} | "
+                f"Desc: {descricao_transacao:<15} | "
+                f"Data: {data}"
+            )
+
     else:
         print("\nNenhuma transacao encontrada!")
+
+def excluir_transacao(usuario_id):
+
+    listar_contas(usuario_id)
+
+    try:
+        conta_id = int(input("\nDigite o ID da conta: "))
+
+    except ValueError:
+        print("\nID invalido!")
+        return None
+
+    listar_transacoes(
+    usuario_id,
+    conta_id
+    )
+
+    try:
+        id_transacao = int(input("\nDigite o ID da transacao: "))
+    
+    except ValueError:
+        print("\nID invalido!")
+        return None
+    
+    confirmacao = input("\nTem certeza que deseja excluir esta transacao? (s/n): ").lower()
+
+    if confirmacao != "s":
+        print("\nExclusao cancelada.")
+        return None
+    
+    transacao_exlcuida = excluir_transacao_service(
+        usuario_id,
+        conta_id,
+        id_transacao
+    )
+
+    if transacao_exlcuida:
+        print("\nTransacao excluida com sucesso!")
+        return True
+    else:
+        print("\nErro ao excluir transacao.")
+        return None
 
 def menu_deslogado():
 
@@ -298,7 +357,8 @@ def menu_transacoes():
     print("\n===== TRANSACOES =====")
     print("1 - Criar transacao")
     print("2 - Listar transacoes")
-    print("3 - Voltar")
+    print("3 - Excluir transacao")
+    print("4 - Voltar")
     
     return input("\nEscolha: ")
 
@@ -362,6 +422,9 @@ def main():
                     listar_transacoes(usuario_logado[0])
                 
                 elif opcao_transacoes == "3":
+                    excluir_transacao(usuario_logado[0])
+                
+                elif opcao_transacoes == "4":
                     continue
                 
             elif opcao == "3":

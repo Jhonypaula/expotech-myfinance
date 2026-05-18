@@ -85,7 +85,7 @@ def buscar_transacao_por_id(
             valor_transacoes
         FROM tbl_transacoes
         WHERE conta_id = %s
-        AND id_transcoes = %s
+        AND id_transacoes = %s
     """
     
     valores = conta_id, id_transacao
