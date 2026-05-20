@@ -2,7 +2,8 @@ from repository.transacao_repository import (
     criar_transacao_repository,
     listar_transacoes_repository,
     buscar_transacao_por_id,
-    excluir_transacao_repository
+    excluir_transacao_repository,
+    editar_transacao_repository
 )
 from repository.conta_repository import (
     buscar_conta_por_id,
@@ -38,7 +39,7 @@ def criar_transacao_service(
     # ===============================
     
     if tipo_transacao not in TIPOS_VALIDOS:
-        print("\nTipo de transacao invalido!")
+        print("\nTipo de transacao_existente invalido!")
         return None
     
     # ===============================
@@ -211,4 +212,127 @@ def excluir_transacao_service(
         id_transacoes
     )
     
+    return True
+
+def editar_transacao_service(
+    usuario_id,
+    conta_id,
+    id_transacao,
+    categoria_id,
+    tipo_transacao,
+    valor_transacoes_str,
+    descricao_transacao
+):
+    TIPOS_VALIDOS = [
+        'entrada',
+        'saida'
+    ]
+
+    if tipo_transacao not in TIPOS_VALIDOS:
+        print("\nTipo de transacao invalido!")
+        return None
+    
+    valor_transacoes_str = valor_transacoes_str.replace(',', '.')
+
+    try:
+        valor_transacao = float(valor_transacoes_str)
+
+    except ValueError:
+        print("O valor deve ser um número válido")
+        return None
+    
+    if valor_transacao <= 0:
+        print("O valor deve ser um número positivo")
+        return None
+
+    if not validar_campo_vazio(descricao_transacao):
+        print("\nDescricao obrigatoria!")
+        return None
+    
+    if len(descricao_transacao) > 15:
+        print("\nDescricao muito longa! Maximo 15")
+        return None
+    
+    conta_existente = buscar_conta_por_id(
+        usuario_id, 
+        conta_id
+    )
+    
+    if not conta_existente:
+        print("\nConta nao encontrada ou nao pertence ao usuario.")
+        return None
+    
+    categoria_existente = validar_categoria_service(
+        categoria_id
+    )
+    
+    if not categoria_existente:
+        print("\nCategoria nao encontrada!")
+        return None
+    
+    transacao_existente = buscar_transacao_por_id(
+        conta_id,
+        id_transacao
+    )
+
+    if not transacao_existente:
+        print("\nTransacao nao encontrada!")
+        return None
+    
+    # DEFININDO DADOS ANTIGOS
+    
+    tipo_antigo = transacao_existente[1]
+
+    valor_antigo = float(transacao_existente[2])
+
+    # BUSCAR SALDO ATUAL
+
+    saldo_atual = buscar_saldo_conta_repository(
+        conta_id
+    )
+
+    if not saldo_atual:
+        print("\nErro ao buscar saldo!")
+        return None
+    
+    saldo_atual = float(saldo_atual[0])
+
+    # DESFAZER TRANSACAO ANTIGA
+
+    if tipo_antigo == 'entrada':
+        saldo_atual -= valor_antigo
+    
+    else:
+        saldo_atual += valor_antigo
+
+    # APLICAR TRANSACAO NOVA
+    
+    if tipo_transacao == 'entrada':
+        novo_saldo = saldo_atual + valor_transacao
+
+    else:
+        if valor_transacao > saldo_atual:
+            print("\nSaldo insuficiente!")
+            return None
+        
+        novo_saldo = saldo_atual - valor_transacao
+
+    # ATUALIZAR SALDO
+
+    atualizar_saldo_repository(
+        conta_id,
+        novo_saldo
+    )
+
+    # EDITAR TRANSACAO
+    
+    editar_transacao_repository(
+        conta_id,
+        id_transacao,
+        categoria_id,
+        tipo_transacao,
+        valor_transacao,
+        descricao_transacao
+    )
+
     return True

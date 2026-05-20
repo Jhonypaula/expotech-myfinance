@@ -124,3 +124,41 @@ def excluir_transacao_repository(
     
     cursor.close()
     conexao.close()
+
+def editar_transacao_repository(
+    conta_id,
+    id_transacao,
+    categoria_id,
+    tipo_transacao,
+    valor_transacao,
+    descricao_transacao
+):
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    
+    sql = """
+        UPDATE tbl_transacoes
+        SET 
+            categoria_id = %s,
+            tipo_transacoes = %s,
+            valor_transacoes = %s,
+            descricao_transacoes = %s
+        WHERE conta_id = %s
+        AND id_transacoes = %s
+    """
+    
+    valores = (
+        categoria_id,
+        tipo_transacao,
+        valor_transacao,
+        descricao_transacao,
+        conta_id,
+        id_transacao
+    )
+
+    cursor.execute(sql, valores)
+
+    conexao.commit()
+
+    cursor.close()
+    conexao.close()
