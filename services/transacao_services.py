@@ -238,11 +238,11 @@ def editar_transacao_service(
         valor_transacao = float(valor_transacoes_str)
 
     except ValueError:
-        print("O valor deve ser um número válido")
+        print("\nO valor deve ser um número válido")
         return None
     
     if valor_transacao <= 0:
-        print("O valor deve ser um número positivo")
+        print("\nO valor deve ser um número positivo")
         return None
 
     if not validar_campo_vazio(descricao_transacao):

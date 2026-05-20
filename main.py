@@ -74,7 +74,6 @@ def tela_login():
         print('\nErro ao fazer login!')
         return None
 
-
 def logout():
 
     global usuario_logado
@@ -111,7 +110,6 @@ def criar_conta(usuario_id):
         print('\nErro ao criar conta!')
         return None
 
-
 def listar_contas(usuario_id):
 
     contas = listar_contas_service(usuario_id)
@@ -138,7 +136,6 @@ def listar_contas(usuario_id):
         )
 
     return contas
-
 
 def editar_conta(usuario_id):
 
@@ -174,7 +171,6 @@ def editar_conta(usuario_id):
     else:
         print("\nErro ao editar conta.")
         return None
-
 
 def excluir_conta(usuario_id):
 
@@ -300,7 +296,6 @@ def criar_transacao(usuario_id):
         print("\nErro ao criar transacao.")
         return None
 
-
 def listar_transacoes(
     usuario_id,
     conta_id=None
@@ -352,7 +347,6 @@ def listar_transacoes(
         )
 
     return transacoes
-
 
 def excluir_transacao(usuario_id):
 
@@ -409,7 +403,6 @@ def excluir_transacao(usuario_id):
         print("\nErro ao excluir transacao.")
         return None
 
-
 def editar_transacao(usuario_id):
 
     contas = listar_contas(usuario_id)
@@ -440,6 +433,16 @@ def editar_transacao(usuario_id):
     except ValueError:
         print("\nID invalido!")
         return None
+    
+    ids_transacoes = [
+        transacao[0]
+        for transacao in transacoes
+    ]
+
+    if id_transacao not in ids_transacoes:
+
+        print("\nID da transacao nao pertence a esta conta!")
+        return None
 
     categorias = listar_categorias()
 
@@ -453,6 +456,16 @@ def editar_transacao(usuario_id):
 
     except ValueError:
         print("\nCategoria invalida!")
+        return None
+    
+    ids_categorias = [
+        categoria[0]
+        for categoria in categorias
+    ]
+
+    if categoria_id not in ids_categorias:
+
+        print("\nID da categoria invalida!")
         return None
 
     tipo_transacao = input(
