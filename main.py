@@ -21,6 +21,11 @@ from services.categoria_services import (
     listar_categorias_service
 )
 
+from services.dashboard_services import (
+    buscar_saldo_total_service,
+    buscar_total_entradas_service,
+    buscar_total_saidas_service
+)
 usuario_logado = None
 
 def tela_cadastro():
@@ -48,7 +53,6 @@ def tela_cadastro():
     else:
         print('\nErro ao cadastrar usuario!')
         return None
-
 
 def tela_login():
 
@@ -508,6 +512,21 @@ def editar_transacao(usuario_id):
         print("\nErro ao editar transacao.")
         return None
 
+def mostrar_dashboard(usuario_id):
+
+    saldo_total = buscar_saldo_total_service(usuario_id)
+
+    total_entradas = buscar_total_entradas_service(usuario_id)
+
+    total_saidas = buscar_total_saidas_service(usuario_id)
+
+    print("\n===== DASHBOARD =====")
+
+    print(f"\nSaldo total: R$: {saldo_total:.2f}")
+    
+    print(f"\nEntradas: R$ {total_entradas:.2f}")
+
+    print(f"\nSaidas: R$ {total_saidas:.2f}")
 
 # =====================================
 # MENUS
@@ -522,17 +541,16 @@ def menu_deslogado():
 
     return input('\nEscolha: ')
 
-
 def menu_logado():
 
     print(f"\nBem-vindo, {usuario_logado[1]}!")
     print("1 - Contas")
     print("2 - Transacoes")
-    print("3 - Logout")
-    print("4 - Sair")
+    print("3 - Dashboard")
+    print("4 - Logout")
+    print("5 - Sair")
 
     return input('\nEscolha: ')
-
 
 def menu_contas():
 
@@ -545,7 +563,6 @@ def menu_contas():
 
     return input('\nEscolha: ')
 
-
 def menu_transacoes():
 
     print("\n===== TRANSACOES =====")
@@ -556,7 +573,6 @@ def menu_transacoes():
     print("5 - Voltar")
 
     return input("\nEscolha: ")
-
 
 def main():
 
@@ -629,9 +645,12 @@ def main():
                     print("\nOpcao invalida!")
 
             elif opcao == "3":
-                logout()
+                mostrar_dashboard(usuario_logado[0])
 
             elif opcao == "4":
+                logout()
+
+            elif opcao == "5":
 
                 print('\nSaindo do sistema...')
                 break

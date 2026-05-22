@@ -24,8 +24,8 @@ def criar_transacao_service(
     conta_id,
     categoria_id,
     tipo_transacao,
-    valor_transacoes_str,
-    descricao_transacoes,
+    valor_transacao_str,
+    descricao_transacao,
     
 ):
     
@@ -46,28 +46,28 @@ def criar_transacao_service(
     # VALIDAR VALOR
     # ===============================
     
-    valor_transacoes_str = valor_transacoes_str.replace(',', '.')
+    valor_transacao_str = valor_transacao_str.replace(',', '.')
     
     try:
-        valor_transacao = float(valor_transacoes_str)
+        valor_transacao = float(valor_transacao_str)
         
     except ValueError:
-        print("O valor deve ser um número válido")
+        print("\nO valor deve ser um número válido")
         return None
         
     if valor_transacao <= 0:
-        print("O valor deve ser um número positivo")
+        print("\nO valor deve ser um número positivo")
         return None
     
     # ===============================
     # VALIDAR DESCRICAO
     # ===============================
     
-    if not validar_campo_vazio(descricao_transacoes):
+    if not validar_campo_vazio(descricao_transacao):
         print("\nDescricao obrigatoria!")
         return None
     
-    if len(descricao_transacoes) > 15:
+    if len(descricao_transacao) > 15:
         print("\nDescricao muito longa! Maximo 15")
         return None
     
@@ -138,7 +138,7 @@ def criar_transacao_service(
         categoria_id,
         tipo_transacao,
         valor_transacao,
-        descricao_transacoes
+        descricao_transacao
     )
     
     return True
@@ -220,7 +220,7 @@ def editar_transacao_service(
     id_transacao,
     categoria_id,
     tipo_transacao,
-    valor_transacoes_str,
+    valor_transacao_str,
     descricao_transacao
 ):
     TIPOS_VALIDOS = [
@@ -232,10 +232,10 @@ def editar_transacao_service(
         print("\nTipo de transacao invalido!")
         return None
     
-    valor_transacoes_str = valor_transacoes_str.replace(',', '.')
+    valor_transacao_str = valor_transacao_str.replace(',', '.')
 
     try:
-        valor_transacao = float(valor_transacoes_str)
+        valor_transacao = float(valor_transacao_str)
 
     except ValueError:
         print("\nO valor deve ser um número válido")
