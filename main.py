@@ -261,6 +261,19 @@ def criar_transacao(usuario_id):
     except ValueError:
         print("\nID invalido!")
         return None
+    
+    ids_contas = [
+        conta[0]
+        for conta in contas
+    ]
+    
+    if conta_id not in ids_contas:
+        print(
+            "\nConta nao encontrada "
+            "ou nao pertence ao usuario!"
+        )
+        
+        return None
 
     categorias = listar_categorias()
 
@@ -274,6 +287,17 @@ def criar_transacao(usuario_id):
 
     except ValueError:
         print("\nCategoria invalida!")
+        return None
+    
+    ids_categorias = [
+        categoria[0]
+        for categoria in categorias
+    ]
+    if categoria_id not in ids_categorias:
+        print(
+            "\nCategoria nao encontrada!"
+        )
+        
         return None
 
     tipo_transacao = input(
@@ -370,6 +394,19 @@ def excluir_transacao(usuario_id):
 
     except ValueError:
         print("\nID invalido!")
+        return None
+    
+    ids_contas = [
+        conta[0]
+        for conta in contas
+    ]
+    
+    if conta_id not in ids_contas:
+        print(
+            "\nConta nao encontrada "
+            "ou nao pertence ao usuario!"
+        )
+        
         return None
 
     transacoes = listar_transacoes(
