@@ -24,7 +24,10 @@ from services.categoria_services import (
 from services.dashboard_services import (
     buscar_saldo_total_service,
     buscar_total_entradas_service,
-    buscar_total_saidas_service
+    buscar_total_saidas_service,
+    buscar_gastos_categoria_service,
+    buscar_maior_categoria_service,
+    buscar_quantidade_transacoes_service
 )
 usuario_logado = None
 
@@ -514,20 +517,86 @@ def editar_transacao(usuario_id):
 
 def mostrar_dashboard(usuario_id):
 
-    saldo_total = buscar_saldo_total_service(usuario_id)
+    saldo_total = buscar_saldo_total_service(
+        usuario_id
+    )
 
-    total_entradas = buscar_total_entradas_service(usuario_id)
+    total_entradas = buscar_total_entradas_service(
+        usuario_id
+    )
 
-    total_saidas = buscar_total_saidas_service(usuario_id)
+    total_saidas = buscar_total_saidas_service(
+        usuario_id
+    )
 
-    print("\n===== DASHBOARD =====")
+    gastos_categoria = buscar_gastos_categoria_service(
+        usuario_id
+    )
 
-    print(f"\nSaldo total: R$: {saldo_total:.2f}")
-    
-    print(f"\nEntradas: R$ {total_entradas:.2f}")
+    maior_categoria = buscar_maior_categoria_service(
+        usuario_id
+    )
 
-    print(f"\nSaidas: R$ {total_saidas:.2f}")
+    quantidade_transacoes = buscar_quantidade_transacoes_service(
+        usuario_id
+    )
 
+    print("\n╔══════════════════════════════════════════════╗")
+    print("║            📊 DASHBOARD 📊                 ║")
+    print("╚══════════════════════════════════════════════╝")
+
+    print(f"\n💰 Saldo Total : R$ {saldo_total:.2f}")
+
+    print(f"📈 Entradas    : R$ {total_entradas:.2f}")
+
+    print(f"📉 Saidas      : R$ {total_saidas:.2f}")
+
+    print(
+        f"🧾 Transacoes : "
+        f"{quantidade_transacoes}"
+    )
+
+    if maior_categoria:
+
+        nome_categoria = maior_categoria[0]
+
+        total_categoria = float(maior_categoria[1])
+
+        print(
+            f"\n🏆 Maior gasto: "
+            f"{nome_categoria} "
+            f"- R$ {total_categoria:.2f}"
+        )
+
+    print("\n════════ GASTOS POR CATEGORIA ════════")
+
+    if not gastos_categoria:
+        print("\n⚠️  Nenhum gasto encontrado!")
+
+    else:
+
+        for categoria in gastos_categoria:
+
+            nome_categoria = categoria[0]
+
+            total_gasto = float(categoria[1])
+
+            porcentagem = (
+                total_gasto / total_saidas
+            ) * 100
+
+            barra = "█" * int(
+                porcentagem / 5
+            )
+
+            print(
+                f"\n📌 {nome_categoria:<15} | "
+                f"{barra:<20} "
+                f"{porcentagem:.1f}% | "
+                f"R$ {total_gasto:.2f}"
+            )
+
+    print("\n══════════════════════════════════════════════")
 # =====================================
 # MENUS
 # =====================================
