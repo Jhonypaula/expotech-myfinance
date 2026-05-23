@@ -1,0 +1,3 @@
+python-dotenv
+hashlib
+mysql-connector-python
