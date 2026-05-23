@@ -49,13 +49,16 @@ CREATE TABLE tbl_transacoes (
 );
 
 CREATE TABLE password_reset_tokens (
-    id_tokens INTEGER PRIMARY KEY AUTOINCREMENT,
-    usuarios_id INTEGER NOT NULL,
-    token TEXT NOT NULL UNIQUE,
-    expira_em TEXT NOT NULL,
-    usado INTEGER DEFAULT 0,
-    criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(usuarios_id) REFERENCES users(id_usuarios)
+
+    id_tokens INT PRIMARY KEY AUTO_INCREMENT,
+    usuarios_id INT NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    expira_em DATETIME NOT NULL,
+    usado BOOLEAN DEFAULT FALSE,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY(usuarios_id)
+    REFERENCES users(id_usuarios)
 );
 
 INSERT INTO tbl_categorias (

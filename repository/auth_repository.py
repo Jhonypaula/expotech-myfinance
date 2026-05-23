@@ -141,3 +141,30 @@ def verificar_status_conta(usuario_id) -> bool:
     conexao.close()
 
     return status
+
+def atualizar_senha_usuario(
+    usuario_id,
+    senha_hashed
+):
+
+    conexao = conectar_banco()
+
+    cursor = conexao.cursor()
+
+    sql = """
+        UPDATE tbl_usuarios
+        SET senha = %s
+        WHERE id_usuarios = %s
+    """
+
+    valores = (
+        senha_hashed,
+        usuario_id
+    )
+
+    cursor.execute(sql, valores)
+
+    conexao.commit()
+
+    cursor.close()
+    conexao.close()
