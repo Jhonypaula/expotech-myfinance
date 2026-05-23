@@ -119,13 +119,3 @@ def login_usuario_service(
         return None
 
     return usuario
-def login_usuario_service (email_usuario, senha_usuario):
-    
-    senha_hash = hash_senha(senha_usuario)
-    
-    usuario = buscar_usuario_por_login(
-        email_usuario,
-        senha_hash
-    )
-    
-    return usuario

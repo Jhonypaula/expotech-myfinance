@@ -70,6 +70,27 @@ def listar_transacoes_repository(conta_id):
     
     return transacoes
 
+def listar_transacoes_fk(conta_id):
+
+    conexao = conectar_banco()
+
+    cursor = conexao.cursor(dictionary=True)
+
+    sql = """
+        SELECT *
+        FROM tbl_transacoes
+        WHERE conta_id = %s
+    """
+
+    cursor.execute(sql, (conta_id,))
+
+    transacoes = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
+
+    return transacoes
+
 def buscar_transacao_por_id(
     conta_id,
     id_transacao

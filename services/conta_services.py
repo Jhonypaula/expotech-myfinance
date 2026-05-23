@@ -7,6 +7,10 @@ from repository.conta_repository import (
     excluir_conta_repository
 )
 
+from repository.transacao_repository import(
+    listar_transacoes_fk
+)
+
 from utils.validators import validar_campo_vazio
 
 def cadastrar_conta_service(
@@ -121,23 +125,36 @@ def editar_conta_service(
     
     return True
 
-def excluir_conta_service(
-    usuario_id,
-    id_conta
-):
-    
+def excluir_conta_service(usuario_id, id_conta):
+
     conta_existente = buscar_conta_por_id(
         usuario_id,
         id_conta
     )
-    
+
     if not conta_existente:
-        print("\nConta nao encontrada ou nao pertence ao usuario")
+
+        print('\nConta nao encontrada!')
         return None
-    
+
+    transacoes = listar_transacoes_fk(
+        id_conta
+    )
+
+    if transacoes:
+
+        print(
+            f'\nNao e possivel excluir a conta.'
+            f'\nA conta possui {len(transacoes)} transacao(oes)!'
+        )
+
+        return None
+
     excluir_conta_repository(
         usuario_id,
         id_conta
     )
-    
+
+    print('\nConta excluida com sucesso!')
+
     return True
