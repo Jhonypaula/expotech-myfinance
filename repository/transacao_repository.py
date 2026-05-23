@@ -162,3 +162,126 @@ def editar_transacao_repository(
 
     cursor.close()
     conexao.close()
+
+def filtrar_transacoes_tipo_repository(
+    conta_id,
+    tipo_transacao
+):
+    
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+
+    sql = """
+        SELECT
+            t.id_transacoes,
+            t.tipo_transacoes,
+            t.valor_transacoes,
+            t.descricao_transacoes,
+            c.nome_categorias,
+            t.data_transacao
+
+        FROM tbl_transacoes t
+
+        INNER JOIN tbl_categorias c
+        ON t.categoria_id = c.id_categorias
+
+        WHERE t.conta_id = %s
+        AND t.tipo_transacoes = %s
+    """
+
+    valores = (
+        conta_id,
+        tipo_transacao
+    )
+    
+    cursor.execute(sql, valores)
+
+    transacoes = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
+
+    return transacoes
+
+def filtrar_transacoes_categoria_repository(
+    conta_id,
+    categoria_id
+):
+    
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+
+    sql = """
+        SELECT 
+            t.id_transacoes,
+            t.tipo_transacoes,
+            t.valor_transacoes,
+            t.descricao_transacoes,
+            cat.nome_categorias,
+            t.data_transacao
+
+        FROM tbl_transacoes t
+
+        INNER JOIN tbl_categorias cat
+        ON t.categoria_id = cat.id_categorias
+
+        WHERE t.conta_id = %s
+        AND t.categoria_id = %s
+    """
+
+    valores = (
+        conta_id,
+        categoria_id
+    )
+
+    cursor.execute(sql, valores)
+
+    transacoes = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
+
+    return transacoes
+
+def filtrar_transacoes_descricao_repository(
+    conta_id,
+    descricao
+):
+
+    conexao = conectar_banco()
+
+    cursor = conexao.cursor()
+
+    sql = """
+        SELECT
+            t.id_transacoes,
+            t.tipo_transacoes,
+            t.valor_transacoes,
+            t.descricao_transacoes,
+            c.nome_categorias,
+            t.data_transacoes
+
+        FROM tbl_transacoes t
+
+        INNER JOIN tbl_categorias c
+        ON t.categoria_id = c.id_categorias
+
+        WHERE t.conta_id = %s
+        AND t.descricao_transacoes LIKE %s
+    """
+
+    descricao = f"%{descricao}%"
+
+    valores = (
+        conta_id,
+        descricao
+    )
+
+    cursor.execute(sql, valores)
+
+    transacoes = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
+
+    return transacoes

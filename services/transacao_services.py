@@ -3,7 +3,10 @@ from repository.transacao_repository import (
     listar_transacoes_repository,
     buscar_transacao_por_id,
     excluir_transacao_repository,
-    editar_transacao_repository
+    editar_transacao_repository,
+    filtrar_transacoes_tipo_repository,
+    filtrar_transacoes_categoria_repository,
+    filtrar_transacoes_descricao_repository
 )
 from repository.conta_repository import (
     buscar_conta_por_id,
@@ -39,7 +42,7 @@ def criar_transacao_service(
     # ===============================
     
     if tipo_transacao not in TIPOS_VALIDOS:
-        print("\nTipo de transacao_existente invalido!")
+        print("\nTipo de transacao invalida!")
         return None
     
     # ===============================
@@ -206,7 +209,6 @@ def excluir_transacao_service(
         conta_id,
         novo_saldo
     )
-    
     excluir_transacao_repository(
         conta_id,
         id_transacoes
@@ -336,3 +338,112 @@ def editar_transacao_service(
     )
 
     return True
+
+def filtrar_transacoes_tipo_service(
+    usuario_id,
+    conta_id,
+    tipo_transacao
+):
+    
+    TIPOS_VALIDOS = [
+        'entrada',
+        'saida'
+    ]
+
+    if tipo_transacao not in TIPOS_VALIDOS:
+        print("\nTipo de transacao invalido!")
+        return None
+
+    conta_existente = buscar_conta_por_id(
+        usuario_id,
+        conta_id
+    )
+
+    if not conta_existente:
+        print(
+            "\nConta nao encontrada "
+            "ou nao pertence ao usuario!"
+        )
+
+        return None
+
+    transacoes = (
+        filtrar_transacoes_tipo_repository(
+            conta_id,
+            tipo_transacao
+        )
+    )
+
+    return transacoes
+
+def filtrar_transacao_categoria_service(
+    usuario_id,
+    conta_id,
+    categoria_id
+):
+    
+    conta_existente = buscar_conta_por_id(
+        usuario_id,
+        conta_id
+    )
+
+    if not conta_existente:
+
+        print(
+            "\nConta nao encontrada "
+            "ou nao pertence ao usuario!"
+        )
+
+        return None
+
+    categoria_existente = validar_categoria_service(
+        categoria_id
+    )
+
+    if not categoria_existente:
+
+        print("\nCategoria invalida!")
+        return None
+
+    transacoes = (
+        filtrar_transacoes_categoria_repository(
+            conta_id,
+            categoria_id
+        )
+    )
+
+    return transacoes
+
+def filtrar_transacoes_descricao_service(
+    usuario_id,
+    conta_id,
+    descricao
+):
+
+    conta_existente = buscar_conta_por_id(
+        usuario_id,
+        conta_id
+    )
+
+    if not conta_existente:
+
+        print(
+            "\nConta nao encontrada "
+            "ou nao pertence ao usuario!"
+        )
+
+        return None
+
+    if not validar_campo_vazio(descricao):
+
+        print("\nDescricao obrigatoria!")
+        return None
+
+    transacoes = (
+        filtrar_transacoes_descricao_repository(
+            conta_id,
+            descricao
+        )
+    )
+
+    return transacoes

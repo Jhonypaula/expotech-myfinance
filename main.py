@@ -14,7 +14,10 @@ from services.transacao_services import (
     criar_transacao_service,
     listar_transacao_service,
     excluir_transacao_service,
-    editar_transacao_service
+    editar_transacao_service,
+    filtrar_transacoes_tipo_service,
+    filtrar_transacao_categoria_service,
+    filtrar_transacoes_descricao_service
 )
 
 from services.categoria_services import (
@@ -515,6 +518,281 @@ def editar_transacao(usuario_id):
         print("\nErro ao editar transacao.")
         return None
 
+def filtrar_transacoes_tipo(usuario_id):
+
+    contas = listar_contas(usuario_id)
+
+    if not contas:
+        return None
+
+    try:
+        conta_id = int(
+            input("\nDigite o ID da conta: ")
+        )
+
+    except ValueError:
+        print("\nID invalido!")
+        return None
+    
+    ids_contas = [
+        conta[0]
+        for conta in contas
+    ]
+
+    if conta_id not in ids_contas:
+
+        print(
+            "\nConta nao encontrada "
+            "ou nao pertence ao usuario!"
+        )
+
+        return None
+
+    tipo_transacao = input(
+        "\nDigite o tipo de transacao (entrada/saida): "
+    ).strip().lower()
+
+    transacoes = filtrar_transacoes_tipo_service(
+        usuario_id,
+        conta_id,
+        tipo_transacao
+    )
+
+    if not transacoes:
+        print("\nNenhuma transacao encontrada!")
+        return None
+
+    print("\n╔══════════════════════════════════════════════╗")
+    print("║         🔎 TRANSACOES FILTRADAS 🔎         ║")
+    print("╚══════════════════════════════════════════════╝")
+
+    for transacao in transacoes:
+
+        id_transacao = transacao[0]
+
+        tipo = transacao[1]
+
+        valor = float(transacao[2])
+
+        descricao = transacao[3]
+
+        categoria = transacao[4]
+
+        data = transacao[5].strftime(
+            "%d/%m/%Y"
+        )
+
+        emoji_tipo = (
+            "📈"
+            if tipo == "entrada"
+            else "📉"
+        )
+
+        print(
+            f"""
+    ╔══════════════════════════════════════╗
+    ║ 🆔 ID: {id_transacao:<29}
+    ║ {emoji_tipo} Tipo: {tipo:<25}
+    ║ 💰 Valor: R$ {valor:<19.2f}
+    ║ 📂 Categoria: {categoria:<18}
+    ║ 📝 Descricao: {descricao:<17}
+    ║ 📅 Data: {data:<24}
+    ╚══════════════════════════════════════╝
+    """
+        )
+
+def filtrar_transacoes_categoria(usuario_id):
+
+    contas = listar_contas(usuario_id)
+
+    if not contas:
+        return None
+    
+    try:
+        conta_id = int(
+            input("\nDigite o ID da conta: ")
+        )
+
+    except ValueError:
+        print("\nID invalido!")
+        return None
+    
+    ids_contas = [
+        conta[0]
+        for conta in contas
+    ]
+
+    if conta_id not in ids_contas:
+
+        print(
+            "\nConta nao encontrada "
+            "ou nao pertence ao usuario!"
+        )
+
+        return None
+    
+    categorias = listar_categorias()
+
+    if not categorias:
+        return None
+
+    try:
+        categoria_id = int(
+            input("\nDigite o ID da categoria: ")
+        )
+
+    except ValueError:
+        print("\nCategoria invalida!")
+        return None
+
+    ids_categorias = [
+        categoria[0]
+        for categoria in categorias
+    ]
+
+    if categoria_id not in ids_categorias:
+
+        print("\nCategoria invalida!")
+        return None
+
+    transacoes = (
+        filtrar_transacao_categoria_service(
+            usuario_id,
+            conta_id,
+            categoria_id
+        )
+    )
+
+    if not transacoes:
+
+        print("\nNenhuma transacao encontrada!")
+        return None
+
+    print("\n╔══════════════════════════════════════════════╗")
+    print("║         🔎 TRANSACOES FILTRADAS 🔎         ║")
+    print("╚══════════════════════════════════════════════╝")
+
+    for transacao in transacoes:
+
+        id_transacao = transacao[0]
+
+        tipo = transacao[1]
+
+        valor = float(transacao[2])
+
+        descricao = transacao[3]
+
+        categoria = transacao[4]
+
+        data = transacao[5].strftime(
+            "%d/%m/%Y"
+        )
+
+        emoji_tipo = (
+            "📈"
+            if tipo == "entrada"
+            else "📉"
+        )
+
+        print(
+            f"""
+    ╔════════════════════════════════════╗
+    ║ 🆔 ID: {id_transacao:<28}
+    ║ {emoji_tipo} Tipo: {tipo:<24}
+    ║ 💰 Valor: R$ {valor:<18.2f}
+    ║ 📂 Categoria: {categoria:<18}
+    ║ 📝 Descricao: {descricao:<17}
+    ║ 📅 Data: {data:<23}
+    ╚════════════════════════════════════╝
+    """
+        )
+
+def filtrar_transacoes_descricao(usuario_id):
+
+    contas = listar_contas(usuario_id)
+
+    if not contas:
+        return None
+
+    try:
+        conta_id = int(
+            input("\nDigite o ID da conta: ")
+        )
+
+    except ValueError:
+        print("\nID invalido!")
+        return None
+
+    ids_contas = [
+        conta[0]
+        for conta in contas
+    ]
+
+    if conta_id not in ids_contas:
+
+        print(
+            "\nConta nao encontrada "
+            "ou nao pertence ao usuario!"
+        )
+
+        return None
+
+    descricao = input(
+        "\nDigite a descricao para buscar: "
+    ).strip().lower()
+
+    transacoes = (
+        filtrar_transacoes_descricao_service(
+            usuario_id,
+            conta_id,
+            descricao
+        )
+    )
+
+    if not transacoes:
+
+        print("\nNenhuma transacao encontrada!")
+        return None
+
+    print("\n╔══════════════════════════════════════════════╗")
+    print("║         🔎 TRANSACOES FILTRADAS 🔎         ║")
+    print("╚══════════════════════════════════════════════╝")
+
+    for transacao in transacoes:
+
+        id_transacao = transacao[0]
+
+        tipo = transacao[1]
+
+        valor = float(transacao[2])
+
+        descricao = transacao[3]
+
+        categoria = transacao[4]
+
+        data = transacao[5].strftime(
+            "%d/%m/%Y"
+        )
+
+        emoji_tipo = (
+            "📈"
+            if tipo == "entrada"
+            else "📉"
+        )
+
+        print(
+            f"""
+    ╔════════════════════════════════════╗
+    ║ 🆔 ID: {id_transacao:<28}
+    ║ {emoji_tipo} Tipo: {tipo:<24}
+    ║ 💰 Valor: R$ {valor:<18.2f}
+    ║ 📂 Categoria: {categoria:<18}
+    ║ 📝 Descricao: {descricao:<17}
+    ║ 📅 Data: {data:<23}
+    ╚════════════════════════════════════╝
+    """
+        )
+
 def mostrar_dashboard(usuario_id):
 
     saldo_total = buscar_saldo_total_service(
@@ -597,6 +875,7 @@ def mostrar_dashboard(usuario_id):
             )
 
     print("\n══════════════════════════════════════════════")
+
 # =====================================
 # MENUS
 # =====================================
@@ -639,9 +918,22 @@ def menu_transacoes():
     print("2 - Listar transacoes")
     print("3 - Excluir transacao")
     print("4 - Editar transacao")
-    print("5 - Voltar")
+    print("5 - Filtrar transacoes")
+    print("6 - Voltar")
 
     return input("\nEscolha: ")
+
+def menu_filtrar_transacoes():
+
+    print("\n===== FILTRAR TRANSACOES =====")
+
+    print("1 - Filtrar por tipo")
+    print("2 - Filtrar por categoria")
+    print("3 - Buscar por descricao")
+    print("4 - Voltar")
+
+    return input("\nEscolha: ")
+
 
 def main():
 
@@ -708,8 +1000,31 @@ def main():
                     editar_transacao(usuario_logado[0])
 
                 elif opcao_transacoes == "5":
-                    continue
+                    opcao_filtro = menu_filtrar_transacoes()
 
+                    if opcao_filtro == "1":
+                        filtrar_transacoes_tipo(
+                            usuario_logado[0]
+                        )
+
+                    elif opcao_filtro == "2":
+                        filtrar_transacoes_categoria(
+                            usuario_logado[0]
+                        )
+
+                    elif opcao_filtro == "3":
+                        filtrar_transacoes_descricao(
+                            usuario_logado[0]
+                        )
+
+                    elif opcao_filtro == "4":
+                        continue
+
+                    else:
+                        print("\nOpcao invalida!")
+
+                elif opcao_transacoes == "6":
+                    continue
                 else:
                     print("\nOpcao invalida!")
 
