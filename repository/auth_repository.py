@@ -93,3 +93,51 @@ def buscar_usuario_por_login(email_usuario, senha_hash):
     conexao.close()
     
     return usuario
+
+#==========================================
+# Soft Delete do Usuário
+#==========================================
+
+def excluir_conta(usuario_id) -> str:
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+
+    sql = """
+        UPDATE tbl_usuarios
+        SET ativo = "False"
+        WHERE id_usuarios = %s
+    """
+    valores = (
+        usuario_id,
+    )
+
+    cursor.execute(sql, valores)
+    conexao.commit()
+
+    cursor.close()
+    conexao.close()
+
+    return "Conta excluída com sucesso"
+
+def verificar_status_conta(usuario_id) -> bool:
+
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+
+    sql = """
+        SELECT ativo
+        FROM tbl_usuarios 
+        WHERE id_usuarios = %s
+    """
+    valores = (
+        usuario_id,
+    )
+
+    cursor.execute(sql, valores)
+
+    status = cursor.fetchone()[0]
+
+    cursor.close()
+    conexao.close()
+
+    return status

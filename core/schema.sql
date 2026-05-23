@@ -9,6 +9,7 @@ CREATE TABLE tbl_usuarios (
     nome_usuarios VARCHAR(100) NOT NULL,
     email_usuarios VARCHAR(150) NOT NULL UNIQUE,
     senha_usuarios VARCHAR(255) NOT NULL,
+    ativo BOOL NOT NULL,
     data_criacao_usuarios DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -64,3 +65,5 @@ VALUES
 ('Assinaturas', 'Netflix, Spotify e serviços recorrentes'),
 ('Transferencias', 'PIX, TED e transferências bancárias'),
 ('Outros', 'Transações diversas que não se encaixam nas demais categorias');
+
+
