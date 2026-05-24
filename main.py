@@ -138,10 +138,12 @@ def listar_contas(usuario_id):
 
     if not contas:
 
-        print('\nNenhuma conta encontrada!')
+        print('\n⚠️ Nenhuma conta encontrada!')
         return None
 
-    print('\n===== SUAS CONTAS =====')
+    print("\n╔══════════════════════════════════════════════╗")
+    print("║               💳️ SUAS CONTAS 💳️              ║")
+    print("╚══════════════════════════════════════════════╝")
 
     for conta in contas:
 
@@ -149,13 +151,22 @@ def listar_contas(usuario_id):
         nome_conta = conta[1]
         tipo_conta = conta[2]
         saldo_conta = conta[3]
+        
+        emoji_tipo = {
+            "corrente" : "🏦️",
+            "poupanca" : "💰️",
+            "carteira" : "👝️"
+        }.get(tipo_conta, "💳️")
 
-        print(
-            f"ID: {id_conta:<5} | "
-            f"Nome: {nome_conta:<15} | "
-            f"Tipo: {tipo_conta:<10} | "
-            f"Saldo: {saldo_conta:.2f}"
-        )
+        
+        print(f"╔══════════════════════════════════════════════╗")
+        print(f"║ 🆔️ ID: {id_conta}")
+        print(f"║ {emoji_tipo} Conta: {nome_conta}")
+        print(f"║ 📁️ Tipo: {tipo_conta}")
+        print(f"║ 💵️ Saldo: R$ {saldo_conta:.2f}")
+        print(f"╚══════════════════════════════════════════════╝")
+        
+        pausar_tela()
 
     return contas
 
@@ -346,7 +357,6 @@ def listar_transacoes(
     usuario_id,
     conta_id=None
 ):
-
     if conta_id is None:
 
         contas = listar_contas(usuario_id)
@@ -358,7 +368,7 @@ def listar_transacoes(
             conta_id = int(input("\nDigite o ID da conta: "))
 
         except ValueError:
-            print("\nID invalido!")
+            print("\n❌️ ID invalido!")
             return None
 
     transacoes = listar_transacao_service(
@@ -368,10 +378,12 @@ def listar_transacoes(
 
     if not transacoes:
 
-        print("\nNenhuma transacao encontrada!")
+        print("\n⚠️ Nenhuma transacao encontrada!")
         return None
 
-    print("\n===== TRANSACOES =====")
+    print("\n╔══════════════════════════════════════════════╗")
+    print("║               💸️ TRANSACOES 💸️                ║")
+    print("╚══════════════════════════════════════════════╝")
 
     for transacao in transacoes:
 
@@ -382,15 +394,23 @@ def listar_transacoes(
         categoria_transacao = transacao[4]
 
         data = transacao[5].strftime("%d/%m/%Y")
-
-        print(
-            f"ID: {id_transacao:<5} | "
-            f"Tipo: {tipo_transacao:<10} | "
-            f"Valor: {valor_transacao:<10.2f} | "
-            f"Categoria: {categoria_transacao:<15} | "
-            f"Desc: {descricao_transacao:<15} | "
-            f"Data: {data}"
+        
+        emoji_tipo = (
+            "📈️"
+            if tipo_transacao == "entrada"
+            else "📉️"
         )
+
+        print(f"╔══════════════════════════════════════════════╗")
+        print(f"║ 🆔️ ID: {id_transacao}")
+        print(f"║ {emoji_tipo} Tipo: {tipo_transacao}")
+        print(f"║ 💰️ Valor: R$ {valor_transacao:.2f}")
+        print(f"║ 📁️ Categoria: {categoria_transacao}")
+        print(f"║ 📝️ Descricao: {descricao_transacao}")
+        print(f"║ 🗓️ Data: {data}")
+        print(f"╚══════════════════════════════════════════════╝")
+        
+        pausar_tela()
 
     return transacoes
 
@@ -461,6 +481,8 @@ def excluir_transacao(usuario_id):
     else:
         print("\nErro ao excluir transacao.")
         return None
+    
+    pausar_tela()
 
 def editar_transacao(usuario_id):
 
@@ -566,6 +588,8 @@ def editar_transacao(usuario_id):
     else:
         print("\nErro ao editar transacao.")
         return None
+    
+    pausar_tela()
 
 def filtrar_transacoes_tipo(usuario_id):
 
@@ -637,18 +661,16 @@ def filtrar_transacoes_tipo(usuario_id):
             else "📉"
         )
 
-        print(
-            f"""
-    ╔══════════════════════════════════════╗
-    ║ 🆔 ID: {id_transacao:<29}
-    ║ {emoji_tipo} Tipo: {tipo:<25}
-    ║ 💰 Valor: R$ {valor:<19.2f}
-    ║ 📂 Categoria: {categoria:<18}
-    ║ 📝 Descricao: {descricao:<17}
-    ║ 📅 Data: {data:<24}
-    ╚══════════════════════════════════════╝
-    """
-        )
+        print(f"╔══════════════════════════════════════╗")
+        print(f"║ 🆔 ID: {id_transacao}")
+        print(f"║ {emoji_tipo} Tipo: {tipo}")
+        print(f"║ 💰 Valor: R$ {valor:.2f}")
+        print(f"║ 📂 Categoria: {categoria}")
+        print(f"║ 📝 Descricao: {descricao}")
+        print(f"║ 📅 Data: {data}")
+        print(f"╚══════════════════════════════════════╝")
+        
+        pausar_tela()
 
 def filtrar_transacoes_categoria(usuario_id):
 
@@ -743,18 +765,16 @@ def filtrar_transacoes_categoria(usuario_id):
             else "📉"
         )
 
-        print(
-            f"""
-    ╔════════════════════════════════════╗
-    ║ 🆔 ID: {id_transacao:<28}
-    ║ {emoji_tipo} Tipo: {tipo:<24}
-    ║ 💰 Valor: R$ {valor:<18.2f}
-    ║ 📂 Categoria: {categoria:<18}
-    ║ 📝 Descricao: {descricao:<17}
-    ║ 📅 Data: {data:<23}
-    ╚════════════════════════════════════╝
-    """
-        )
+        print(f"╔════════════════════════════════════╗")
+        print(f"║ 🆔 ID: {id_transacao}")
+        print(f"║ {emoji_tipo} Tipo: {tipo}")
+        print(f"║ 💰 Valor: R$ {valor:.2f}")
+        print(f"║ 📂 Categoria: {categoria}")
+        print(f"║ 📝 Descricao: {descricao}")
+        print(f"║ 📅 Data: {data}")
+        print(f"╚════════════════════════════════════╝")
+        
+        pausar_tela()
 
 def filtrar_transacoes_descricao(usuario_id):
 
@@ -841,6 +861,8 @@ def filtrar_transacoes_descricao(usuario_id):
     ╚════════════════════════════════════╝
     """
         )
+        
+        pausar_tela()
 
 def mostrar_dashboard(usuario_id):
 
@@ -924,6 +946,8 @@ def mostrar_dashboard(usuario_id):
             )
 
     print("\n══════════════════════════════════════════════")
+    
+    pausar_tela()
 
 def tela_esqueci_senha():
     
@@ -1045,64 +1069,82 @@ def tela_resetar_senha():
                 "\n❌️ Erro ao resetar a senha!"
             )
 
+def pausar_tela():
+    
+    input(
+        "\n📌️ Pressione ENTER para voltar ao meno . . ."
+    )
+    
 # =====================================
 # MENUS
 # =====================================
 
 def menu_deslogado():
 
-    print('\n==== MY FINANCE ====')
-    print('1 - Login')
-    print('2 - Cadastrar')
-    print('3 - Esqueci minha senha')
-    print('4 - Sair')
+    print("\n╔══════════════════════════════════════════════╗")
+    print("║               💰 MY FINANCE 💰               ║")
+    print("╠══════════════════════════════════════════════╣")
+    print("║  1 ➜ Login                                   ║")
+    print("║  2 ➜ Cadastrar                               ║")
+    print("║  3 ➜ Esqueci minha senha                     ║")
+    print("║  4 ➜ Sair                                    ║")
+    print("╚══════════════════════════════════════════════╝")
 
-    return input('\nEscolha: ')
+    return input("\n👉 Escolha uma opcao: ")
 
 def menu_logado():
 
-    print(f"\nBem-vindo, {usuario_logado[1]}!")
-    print("1 - Contas")
-    print("2 - Transacoes")
-    print("3 - Dashboard")
-    print("4 - Logout")
-    print("5 - Sair")
+    print("\n╔══════════════════════════════════════════════╗")
+    print(f"║ 👋️ Bem-Vindo, {usuario_logado[1]:<22}         ║")
+    print("╠══════════════════════════════════════════════╣")
+    print("║  1 ➜ Contas                                  ║")
+    print("║  2 ➜ Transacoes                              ║")
+    print("║  4 ➜ Logout                                  ║")
+    print("║  5 ➜ Sair                                    ║")
+    print("╚══════════════════════════════════════════════╝")
 
-    return input('\nEscolha: ')
+    return input("\n👉 Escolha uma opcao: ")
 
 def menu_contas():
 
-    print("\n===== GESTAO DE CONTAS =====")
-    print("1 - Criar conta")
-    print("2 - Listar contas")
-    print("3 - Editar conta")
-    print("4 - Excluir conta")
-    print("5 - Voltar")
+    print("\n╔══════════════════════════════════════════════╗")
+    print("║            💳️ GESTAO DE CONTAS 💳️            ║")
+    print("╠══════════════════════════════════════════════╣")
+    print("║  1 ➜ Criar conta                             ║")
+    print("║  2 ➜ Listar contas                           ║")
+    print("║  4 ➜ Excluir conta                           ║")
+    print("║  5 ➜ Voltar                                  ║")
+    print("╚══════════════════════════════════════════════╝")
 
-    return input('\nEscolha: ')
+    return input("\n👉 Escolha uma opcao: ")
 
 def menu_transacoes():
 
-    print("\n===== TRANSACOES =====")
-    print("1 - Criar transacao")
-    print("2 - Listar transacoes")
-    print("3 - Excluir transacao")
-    print("4 - Editar transacao")
-    print("5 - Filtrar transacoes")
-    print("6 - Voltar")
+    print("\n╔══════════════════════════════════════════════╗")
+    print("║               💸️  TRANSACOES 💸️              ║")
+    print("╠══════════════════════════════════════════════╣")
+    print("║  1 ➜ Criar transacao                         ║")
+    print("║  2 ➜ Listar transacao                        ║")
+    print("║  3 ➜ Excluir transacao                       ║")
+    print("║  4 ➜ Editar transacao                        ║")
+    print("║  5 ➜ Filtrar transacoes                      ║")
+    print("║  6 ➜ Voltar                                  ║")
+    print("╚══════════════════════════════════════════════╝")
 
-    return input("\nEscolha: ")
+    return input("\n👉 Escolha uma opcao: ")
 
 def menu_filtrar_transacoes():
 
-    print("\n===== FILTRAR TRANSACOES =====")
+    print("\n╔══════════════════════════════════════════════╗")
+    print("║          🔎️ FILTRAR TRANSACOES 🔎️              ║")
+    print("╠══════════════════════════════════════════════╣")
+    print("║  1 ➜ Filtrar por tipo                          ║")
+    print("║  2 ➜ Filtrar por categoria                     ║")
+    print("║  3 ➜ Buscar por descricao                      ║")
+    print("║  4 ➜ Voltar                                    ║")
+    print("╚══════════════════════════════════════════════╝")
 
-    print("1 - Filtrar por tipo")
-    print("2 - Filtrar por categoria")
-    print("3 - Buscar por descricao")
-    print("4 - Voltar")
-
-    return input("\nEscolha: ")
+    return input("\n👉 Escolha uma opcao: ")
 
 
 def main():
