@@ -4,14 +4,24 @@ from repository.categoria_repository import (
 )
 
 def listar_categorias_service():
-    categorias = listar_categorias_repository()
+    try:
+        categorias = listar_categorias_repository()
     
-    return categorias
+        return categorias
+    except Exception as e:
+        
+        print(f"Erro interno: {e}")
 
 def validar_categoria_service(categoria_id):
-    categorias = buscar_categoria_por_id(categoria_id)
     
-    if not categorias:   
-        return None
+    try:
+        categorias = buscar_categoria_por_id(categoria_id)
     
-    return categorias
+        if not categorias:   
+            return None
+    
+        return categorias
+    
+    except Exception as e:
+        
+        print(f"Erro interno: {e}")

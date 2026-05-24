@@ -20,72 +20,82 @@ def cadastrar_conta_service(
     saldo_inicial_str
 ):
     
-    contas_validas = [
-        'corrente', 
-        'poupanca', 
-        'carteira'
-    ]
-    
-    MAX_SALDO = 99999999.99
-    
-    if not validar_campo_vazio(nome_conta):
-        print('\nNome da conta é obrigatório')
-        
-        return None
-    
-    if tipo_conta not in contas_validas:
-        print('\nTipo de conta inválida. Tipos válidos: corrente, poupança, carteira')
-        
-        return None
-    
-    saldo_inicial_str = saldo_inicial_str.replace(',', '.')
-    
     try:
-        saldo_inicial = float(saldo_inicial_str)
-    except ValueError:
-        print('\nSaldo inicial deve ser um número válido')
+        contas_validas = [
+            'corrente', 
+            'poupanca', 
+            'carteira'
+        ]
         
-        return None
-    
-    if saldo_inicial < 0:
-        print('\nSaldo inicial não pode ser negativo')
+        MAX_SALDO = 99999999.99
         
-        return None
-    
-    if saldo_inicial > MAX_SALDO:
-        print(f'\nSaldo inicial não pode ser maior que {MAX_SALDO}')
+        if not validar_campo_vazio(nome_conta):
+            print('\nNome da conta é obrigatório')
+            
+            return None
         
-        return None 
-    
-    conta_existente = buscar_conta_por_nome(
-        usuario_id,
-        nome_conta
-    )
-    
-    if conta_existente:
-        print('\nJá existe uma conta com esse nome')
+        if tipo_conta not in contas_validas:
+            print('\nTipo de conta inválida. Tipos válidos: corrente, poupança, carteira')
+            
+            return None
         
-        return None
+        saldo_inicial_str = saldo_inicial_str.replace(',', '.')
+        
+        try:
+            saldo_inicial = float(saldo_inicial_str)
+        except ValueError:
+            print('\nSaldo inicial deve ser um número válido')
+            
+            return None
+        
+        if saldo_inicial < 0:
+            print('\nSaldo inicial não pode ser negativo')
+            
+            return None
+        
+        if saldo_inicial > MAX_SALDO:
+            print(f'\nSaldo inicial não pode ser maior que {MAX_SALDO}')
+            
+            return None 
+        
+        conta_existente = buscar_conta_por_nome(
+            usuario_id,
+            nome_conta
+        )
+        
+        if conta_existente:
+            print('\nJá existe uma conta com esse nome')
+            
+            return None
+        
+        criar_conta_repository(
+            usuario_id,
+            nome_conta,
+            tipo_conta,
+            saldo_inicial
+        )
+        
+        nova_conta = buscar_conta_por_nome(
+            usuario_id,
+            nome_conta
+        )
+        
+        return nova_conta
     
-    criar_conta_repository(
-        usuario_id,
-        nome_conta,
-        tipo_conta,
-        saldo_inicial
-    )
-    
-    nova_conta = buscar_conta_por_nome(
-        usuario_id,
-        nome_conta
-    )
-    
-    return nova_conta
+    except Exception as e:
+        
+        print(f"Erro interno: {e}")
 
 def listar_contas_service(usuario_id):
     
-    contas = listar_contas_repository(usuario_id)
+    try:
+        contas = listar_contas_repository(usuario_id)
     
-    return contas
+        return contas
+    
+    except Exception as e:
+        
+        print(f"Erro interno: {e}")
 
 def editar_conta_service(
     usuario_id,
@@ -93,68 +103,79 @@ def editar_conta_service(
     novo_nome,
     novo_tipo
 ):
-    conta_validas = [
-        'corrente',
-        'poupanca',
-        'carteira'
-    ]
     
-    if not validar_campo_vazio(novo_nome):
-        print("\nNome da conta obrigatorio!")
-        return None
-    
-    if novo_tipo not in conta_validas:
-        print("\nTipo de conta invalido!")
-        return None
-    
-    conta_existente = buscar_conta_por_id(
-        usuario_id,
-        id_conta
-    )
-    
-    if not conta_existente:
-        print("\nConta nao encontrada ou nao pertence ao usuario")
-        return None
+    try:
+        conta_validas = [
+            'corrente',
+            'poupanca',
+            'carteira'
+        ]
+        
+        if not validar_campo_vazio(novo_nome):
+            print("\nNome da conta obrigatorio!")
+            return None
+        
+        if novo_tipo not in conta_validas:
+            print("\nTipo de conta invalido!")
+            return None
+        
+        conta_existente = buscar_conta_por_id(
+            usuario_id,
+            id_conta
+        )
+        
+        if not conta_existente:
+            print("\nConta nao encontrada ou nao pertence ao usuario")
+            return None
 
-    editar_conta_repository(
-        usuario_id,
-        id_conta,
-        novo_nome,
-        novo_tipo
-    )
+        editar_conta_repository(
+            usuario_id,
+            id_conta,
+            novo_nome,
+            novo_tipo
+        )
+        
+        return True
     
-    return True
+    except Exception as e:
+        
+        print(f"Erro interno: {e}")
 
 def excluir_conta_service(usuario_id, id_conta):
 
-    conta_existente = buscar_conta_por_id(
-        usuario_id,
-        id_conta
-    )
-
-    if not conta_existente:
-
-        print('\nConta nao encontrada!')
-        return None
-
-    transacoes = listar_transacoes_fk(
-        id_conta
-    )
-
-    if transacoes:
-
-        print(
-            f'\nNao e possivel excluir a conta.'
-            f'\nA conta possui {len(transacoes)} transacao(oes)!'
+    try:
+        conta_existente = buscar_conta_por_id(
+            usuario_id,
+            id_conta
         )
 
-        return None
+        if not conta_existente:
 
-    excluir_conta_repository(
-        usuario_id,
-        id_conta
-    )
+            print('\nConta nao encontrada!')
+            return None
 
-    print('\nConta excluida com sucesso!')
+        transacoes = listar_transacoes_fk(
+            id_conta
+        )
 
-    return True
+        if transacoes:
+
+            print(
+                f'\nNao e possivel excluir a conta.'
+                f'\nA conta possui {len(transacoes)} transacao(oes)!'
+            )
+
+            return None
+
+        excluir_conta_repository(
+            usuario_id,
+            id_conta
+        )
+
+        print('\nConta excluida com sucesso!')
+
+        return True
+
+    except Exception as e:
+        
+        print(f"Erro interno: {e}")

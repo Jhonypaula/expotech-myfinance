@@ -22,100 +22,106 @@ def cadastrar_usuario_service(
     senha_usuario
 ):
 
-    if not validar_campo_vazio(nome_usuario):
+    try:
+        if not validar_campo_vazio(nome_usuario):
 
-        print('\nNome obrigatorio!')
-        return None
+            print('\nNome obrigatorio!')
+            return None
 
-    if not validar_campo_vazio(email_usuario):
+        if not validar_campo_vazio(email_usuario):
 
-        print('\nEmail obrigatorio!')
-        return None
+            print('\nEmail obrigatorio!')
+            return None
 
-    if not validar_email(email_usuario):
+        if not validar_email(email_usuario):
 
-        print('\nEmail invalido!')
-        return None
+            print('\nEmail invalido!')
+            return None
 
-    if not validar_campo_vazio(senha_usuario):
+        if not validar_campo_vazio(senha_usuario):
 
-        print('\nSenha obrigatoria!')
-        return None
+            print('\nSenha obrigatoria!')
+            return None
 
-    if not validar_senha(senha_usuario):
+        if not validar_senha(senha_usuario):
 
-        print(
-            "\nSenha fraca!"
-            "\nA senha deve conter:"
-            "\n- minimo 8 caracteres"
-            "\n- letra maiuscula"
-            "\n- letra minuscula"
-            "\n- numero"
-            "\n- caractere especial"
-        )
+            print(
+                "\nSenha fraca!"
+                "\nA senha deve conter:"
+                "\n- minimo 8 caracteres"
+                "\n- letra maiuscula"
+                "\n- letra minuscula"
+                "\n- numero"
+                "\n- caractere especial"
+            )
 
-        return None
+            return None
 
-    usuario_existente = buscar_usuario_por_email(
-        email_usuario
-    )
-
-    if usuario_existente:
-
-        print('\nEmail ja cadastrado!')
-        return None
-
-    senha_hash = hash_senha(
-        senha_usuario
-    )
-
-    criar_usuario(
-        nome_usuario,
-        email_usuario,
-        senha_hash
-    )
-
-    usuario_cadastrado = (
-        buscar_usuario_cadastrado(
+        usuario_existente = buscar_usuario_por_email(
             email_usuario
         )
-    )
 
-    return usuario_cadastrado
+        if usuario_existente:
 
+            print('\nEmail ja cadastrado!')
+            return None
+
+        senha_hash = hash_senha(
+            senha_usuario
+        )
+
+        criar_usuario(
+            nome_usuario,
+            email_usuario,
+            senha_hash
+        )
+
+        usuario_cadastrado = (
+            buscar_usuario_cadastrado(
+                email_usuario
+            )
+        )
+
+        return usuario_cadastrado
+    except Exception as e:
+        print(f"Erro interno: {e}")
 
 def login_usuario_service(
     email_usuario,
     senha_usuario
 ):
 
-    if not validar_campo_vazio(email_usuario):
+    try:
+        if not validar_campo_vazio(email_usuario):
 
-        print('\nEmail obrigatorio!')
-        return None
+            print('\nEmail obrigatorio!')
+            return None
 
-    if not validar_email(email_usuario):
+        if not validar_email(email_usuario):
 
-        print('\nEmail invalido!')
-        return None
+            print('\nEmail invalido!')
+            return None
 
-    if not validar_campo_vazio(senha_usuario):
+        if not validar_campo_vazio(senha_usuario):
 
-        print('\nSenha obrigatoria!')
-        return None
+            print('\nSenha obrigatoria!')
+            return None
 
-    senha_hash = hash_senha(
-        senha_usuario
-    )
+        senha_hash = hash_senha(
+            senha_usuario
+        )
 
-    usuario = buscar_usuario_por_login(
-        email_usuario,
-        senha_hash
-    )
+        usuario = buscar_usuario_por_login(
+            email_usuario,
+            senha_hash
+        )
 
-    if not usuario:
+        if not usuario:
 
-        print('\nEmail ou senha invalidos!')
-        return None
+            print('\nEmail ou senha invalidos!')
+            return None
 
-    return usuario
+        return usuario
+    
+    except Exception as e:
+        print(f"Erro interno: {e}")
