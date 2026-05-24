@@ -1,6 +1,7 @@
 from services.auth_services import (
     cadastrar_usuario_service,
-    login_usuario_service
+    login_usuario_service,
+    buscar_usuario_por_email
 )
 
 from services.conta_services import (
@@ -32,6 +33,17 @@ from services.dashboard_services import (
     buscar_maior_categoria_service,
     buscar_quantidade_transacoes_service
 )
+
+from services.resetar_senha_service import(
+    requisicao_alterar_senha,
+    resetar_senha,
+    validar_token_reset
+)
+
+from utils.regex_validators import (
+    validar_senha
+)
+
 usuario_logado = None
 
 def tela_cadastro():
@@ -913,6 +925,126 @@ def mostrar_dashboard(usuario_id):
 
     print("\n══════════════════════════════════════════════")
 
+def tela_esqueci_senha():
+    
+    print("\n╔══════════════════════════════════════════════╗")
+    print("║            🔐️ RECUPERAR SENHA 🔐️               ║")
+    print("╚══════════════════════════════════════════════╝")
+    
+    email = input(
+        "\nDigite seu email: "
+    ).strip().lower()
+    
+    usuario = buscar_usuario_por_email(
+        email
+    )
+    
+    requisicao_alterar_senha(
+        email
+    )
+    
+    print(
+        "\n📩️ Se o email existir, um token foi enviado."
+    )
+    
+    if usuario:
+        
+        redefinir = input(
+            "\nDeseja redefinir a senha agora? (s/n): "
+        ).strip().lower()
+    
+        if redefinir == "s":
+            
+            tela_resetar_senha()
+            
+        else:
+            print(
+                "\n📌️ Voce pode redefinir a senha depois pelo menu."
+            )
+        
+    else:
+        print(
+            "\n❌️ Erro ao solicitar recuperacao de senha!"
+        )
+
+def tela_resetar_senha():
+    
+    print("\n╔══════════════════════════════════════════════╗")
+    print("║            ♻️ RESETAR SENHA ♻️               ║")
+    print("╚══════════════════════════════════════════════╝")
+    
+    while True:
+    
+        token = input(
+            "\nDigite o token recebido (ou 0 para cancelar): "
+        ).strip()
+        
+        if token == "0":
+            
+            print(
+                "\n📌️ Redefinicao cancelada."
+            )
+            
+            return None
+        
+        token_valido = validar_token_reset(
+            token
+        )
+        
+        if not token_valido:
+            print(
+                "\n❌️ Token invalido ou expirado!"
+            )
+        else:
+            print(
+                "\n✅️ Token valido!"
+            )
+            break
+        
+    while True:
+        
+        nova_senha = input(
+            "\nDigite a nova senha (ou 0 para cancelar): "
+        )
+        if nova_senha == "0":
+            
+            print(
+                "\n📌️ Redefinicao cancelada."
+            )
+
+            return None
+        
+        if not validar_senha(nova_senha):
+            
+            print(
+                "\n❌️ Senha fraca!"
+                "\nA senha deve conter:"
+                "\n- minimo 8 caracteres"
+                "\n- letra maiuscula"
+                "\n- letra minuscula"
+                "\n- numero"
+                "\n- caractere especial"
+            )
+            
+            continue
+        
+        resultado = resetar_senha(
+            token, 
+            nova_senha
+        )
+        
+        if resultado:
+            print(
+                "\n✅️ Senha alterada com sucesso!"
+            )
+            
+            break
+        
+        else:
+            print(
+                "\n❌️ Erro ao resetar a senha!"
+            )
+
 # =====================================
 # MENUS
 # =====================================
@@ -922,7 +1054,8 @@ def menu_deslogado():
     print('\n==== MY FINANCE ====')
     print('1 - Login')
     print('2 - Cadastrar')
-    print('3 - Sair')
+    print('3 - Esqueci minha senha')
+    print('4 - Sair')
 
     return input('\nEscolha: ')
 
@@ -987,8 +1120,10 @@ def main():
                 tela_cadastro()
 
             elif opcao == "3":
-
-                print('\nSaindo do sistema...')
+                tela_esqueci_senha()
+            
+            elif opcao == '4':
+                print("\nSaindo do sistema . . .")
                 break
 
             else:

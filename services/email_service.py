@@ -10,7 +10,11 @@ from core.config import (
     EMAIL_PASSWORD
 )
 
-def send_email(to_email, subject, body):
+def send_email(
+    to_email, 
+    subject, 
+    body
+):
 
     message = MIMEMultipart()
 

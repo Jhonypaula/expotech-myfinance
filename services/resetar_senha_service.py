@@ -8,7 +8,8 @@ from repository.auth_repository import (
 from repository.resetar_senha_repository import (
     salvar_reset_token,
     buscar_token,
-    atualizar_token_como_usado
+    atualizar_token_como_usado,
+    invalidar_tokens_anteriores
 )
 
 from utils.token_generator import (
@@ -23,45 +24,55 @@ from services.email_service import (
     send_email
 )
 
+from utils.regex_validators import (
+    validar_senha
+)
+
+from utils.validators import (
+    validar_campo_vazio
+)
+
 
 def requisicao_alterar_senha(email):
 
     usuario = buscar_usuario_por_email(email)
 
-    if not usuario:
-        return False
+    if usuario:
 
-    token = generate_reset_token()
+        token = generate_reset_token()
 
-    expira_em = (
-        datetime.now() +
-        timedelta(minutes=15)
-    ).isoformat()
+        expira_em = (
+            datetime.now() +
+            timedelta(minutes=15)
+        )
+        
+        invalidar_tokens_anteriores(
+            usuario["id_usuarios"]
+        )
 
-    salvar_reset_token(
-        usuario["id_usuarios"],
-        token,
-        expira_em
-    )
+        salvar_reset_token(
+            usuario["id_usuarios"],
+            token,
+            expira_em
+        )
 
-    body = f"""
-Olá.
+        body = f"""
+            Olá.
 
-Seu token de recuperação é:
+            Seu token de recuperação é:
 
-{token}
+            {token}
 
-Esse token expira em 15 minutos.
-"""
+            Esse token expira em 15 minutos.
+        """
 
-    send_email(
-        email,
-        "Recuperação de senha",
-        body
-    )
+        send_email(
+            email,
+            "Recuperação de senha",
+            body
+        )
 
     return True
-
 
 def resetar_senha(
     token,
@@ -76,11 +87,29 @@ def resetar_senha(
     if token_data["usado"] == 1:
         return False
 
-    expira_em = datetime.fromisoformat(
+    expira_em =(
         token_data["expira_em"]
     )
 
     if datetime.now() > expira_em:
+        return False
+
+    if not validar_campo_vazio(nova_senha):
+        print("\nSenha obrigatoria!")
+        return False
+    
+    if not validar_senha(nova_senha):
+        
+        print(
+            "\n❌️ Senha fraca!"
+            "\nA senha deve conter:"
+            "\n- minimo 8 caracteres"
+            "\n- letra maiuscula"
+            "\n- letra minuscula"
+            "\n- numero"
+            "\n- caractere especial"
+        )
+        
         return False
 
     senha_hashed = hash_senha(
@@ -88,10 +117,30 @@ def resetar_senha(
     )
 
     atualizar_senha_usuario(
-        token_data["usuarios_id"],
+        token_data["usuario_id"],
         senha_hashed
     )
 
     atualizar_token_como_usado(token)
 
     return True
+
+def validar_token_reset(
+    token
+):
+    
+    token_data = buscar_token(
+        token
+    )
+    
+    if not token_data:
+        return None
+    
+    expira_em = token_data[
+        "expira_em"
+    ]
+    
+    if datetime.now() > expira_em:
+        return None
+    
+    return token_data

@@ -9,7 +9,7 @@ CREATE TABLE tbl_usuarios (
     nome_usuarios VARCHAR(100) NOT NULL,
     email_usuarios VARCHAR(150) NOT NULL UNIQUE,
     senha_usuarios VARCHAR(255) NOT NULL,
-    ativo BOOL NOT NULL,
+    ativo BOOL NOT NULL DEFAULT TRUE,
     data_criacao_usuarios DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -48,17 +48,17 @@ CREATE TABLE tbl_transacoes (
     FOREIGN KEY (categoria_id) REFERENCES tbl_categorias(id_categorias)
 );
 
-CREATE TABLE password_reset_tokens (
+CREATE TABLE tbl_reset_tokens (
 
     id_tokens INT PRIMARY KEY AUTO_INCREMENT,
-    usuarios_id INT NOT NULL,
+    usuario_id INT NOT NULL,
     token VARCHAR(255) NOT NULL UNIQUE,
     expira_em DATETIME NOT NULL,
     usado BOOLEAN DEFAULT FALSE,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY(usuarios_id)
-    REFERENCES users(id_usuarios)
+    FOREIGN KEY(usuario_id)
+    REFERENCES tbl_usuarios(id_usuarios)
 );
 
 INSERT INTO tbl_categorias (

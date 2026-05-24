@@ -12,8 +12,8 @@ def salvar_reset_token(
     cursor = conexao.cursor()
 
     sql = """
-        INSERT INTO password_reset_tokens (
-            usuarios_id,
+        INSERT INTO tbl_reset_tokens (
+            usuario_id,
             token,
             expira_em
         )
@@ -44,8 +44,9 @@ def buscar_token(token):
 
     sql = """
         SELECT *
-        FROM password_reset_tokens
+        FROM tbl_reset_tokens
         WHERE token = %s
+        AND usado = FALSE
     """
 
     cursor.execute(sql, (token,))
@@ -65,7 +66,7 @@ def atualizar_token_como_usado(token):
     cursor = conexao.cursor()
 
     sql = """
-        UPDATE password_reset_tokens
+        UPDATE tbl_reset_tokens
         SET usado = TRUE
         WHERE token = %s
     """
@@ -74,5 +75,26 @@ def atualizar_token_como_usado(token):
 
     conexao.commit()
 
+    cursor.close()
+    conexao.close()
+    
+def invalidar_tokens_anteriores(
+    usuario_id
+):
+    
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    
+    sql = """
+        UPDATE tbl_reset_tokens
+        SET usado = TRUE
+        WHERE usuario_id = %s
+        AND usado = FALSE
+    """
+    
+    cursor.execute(sql, (usuario_id,))
+    
+    conexao.commit()
+    
     cursor.close()
     conexao.close()

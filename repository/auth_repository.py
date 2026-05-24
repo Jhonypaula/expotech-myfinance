@@ -3,7 +3,9 @@ from core.connection import conectar_banco
 def buscar_usuario_por_email(email_usuario):
     
     conexao = conectar_banco()
-    cursor = conexao.cursor()
+    cursor = conexao.cursor(
+        dictionary=True
+    )
 
     sql = """
         SELECT id_usuarios, nome_usuarios, email_usuarios 
@@ -153,7 +155,7 @@ def atualizar_senha_usuario(
 
     sql = """
         UPDATE tbl_usuarios
-        SET senha = %s
+        SET senha_usuarios = %s
         WHERE id_usuarios = %s
     """
 

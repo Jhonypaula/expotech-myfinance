@@ -9,5 +9,5 @@ EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 SMTP_SERVER = os.getenv("SMTP_SERVER")
 
 SMTP_PORT = int(
-    os.getenv("SMTP_PORT")
+    os.getenv("SMTP_PORT", 587)
 )
