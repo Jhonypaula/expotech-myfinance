@@ -3,7 +3,8 @@ import os
 from services.auth_services import (
     cadastrar_usuario_service,
     login_usuario_service,
-    buscar_usuario_por_email
+    buscar_usuario_por_email,
+    desativar_usuario_service
 )
 
 from services.conta_services import (
@@ -107,14 +108,15 @@ def tela_login():
         pausar_tela()
         return None
 
-def logout():
+def logout(pausar=True):
 
     global usuario_logado
 
     usuario_logado = None
 
     print('\nLogout realizado com sucesso!')
-    pausar_tela()
+    if pausar:
+        pausar_tela()
 
 def criar_conta(usuario_id):
 
@@ -1102,6 +1104,46 @@ def tela_resetar_senha():
                 "\n❌️ Erro ao resetar a senha!"
             )
 
+def desativar_usuario(usuario_id):
+
+    limpar_tela()
+
+    print("\n╔══════════════════════════════════════════════╗")
+    print("║        🚫 DESATIVAR CONTA 🚫                ║")
+    print("╚══════════════════════════════════════════════╝")
+
+    confirmacao = input(
+        "\n⚠️ Deseja desativar sua conta? (s/n): "
+    ).strip().lower()
+
+    if confirmacao != "s":
+
+        print("\n📌 Operacao cancelada.")
+        pausar_tela()
+
+        return None
+
+    usuario_desativado = desativar_usuario_service(
+        usuario_id
+    )
+
+    if usuario_desativado:
+
+        print(
+            "\n✅ Conta desativada com sucesso!"
+        )
+
+        logout(pausar=False)
+        pausar_tela()
+
+    else:
+
+        print(
+            "\n❌ Erro ao desativar conta!"
+        )
+        
+        pausar_tela()
+
 def pausar_tela():
     
     input(
@@ -1135,8 +1177,9 @@ def menu_logado():
     print("║  1 ➜ Contas                                  ║")
     print("║  2 ➜ Transacoes                              ║")
     print("║  3 ➜ Dashboard                               ║")
-    print("║  4 ➜ Logout                                  ║")
-    print("║  5 ➜ Sair                                    ║")
+    print("║  4 ➜ Desativar Conta                         ║")
+    print("║  5 ➜ Logout                                  ║")
+    print("║  6 ➜ Sair                                    ║")
     print("╚══════════════════════════════════════════════╝")
 
     return input("\n👉 Escolha uma opcao: ")
@@ -1185,7 +1228,6 @@ def menu_filtrar_transacoes():
     print("╚══════════════════════════════════════════════╝")
 
     return input("\n👉 Escolha uma opcao: ")
-
 
 def main():
 
@@ -1287,12 +1329,15 @@ def main():
                 mostrar_dashboard(usuario_logado[0])
 
             elif opcao == "4":
-                logout()
+               desativar_usuario(usuario_logado[0])
 
             elif opcao == "5":
 
+                logout()
+
+            elif opcao == "6":
                 limpar_tela()
-                print('\nSaindo do sistema...')
+                print("\nSaindo do sistema . . .")
                 break
 
             else:

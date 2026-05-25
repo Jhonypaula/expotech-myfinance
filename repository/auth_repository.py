@@ -78,7 +78,7 @@ def buscar_usuario_por_login(email_usuario, senha_hash):
     cursor = conexao.cursor()
     
     sql = """
-        SELECT id_usuarios, nome_usuarios, email_usuarios 
+        SELECT id_usuarios, nome_usuarios, email_usuarios
         FROM tbl_usuarios 
         WHERE email_usuarios = %s 
         AND senha_usuarios = %s
@@ -99,27 +99,6 @@ def buscar_usuario_por_login(email_usuario, senha_hash):
 #==========================================
 # Soft Delete do Usuário
 #==========================================
-
-def excluir_conta(usuario_id) -> str:
-    conexao = conectar_banco()
-    cursor = conexao.cursor()
-
-    sql = """
-        UPDATE tbl_usuarios
-        SET ativo = "False"
-        WHERE id_usuarios = %s
-    """
-    valores = (
-        usuario_id,
-    )
-
-    cursor.execute(sql, valores)
-    conexao.commit()
-
-    cursor.close()
-    conexao.close()
-
-    return "Conta excluída com sucesso"
 
 def verificar_status_conta(usuario_id) -> bool:
 
@@ -157,6 +136,7 @@ def atualizar_senha_usuario(
         UPDATE tbl_usuarios
         SET senha_usuarios = %s
         WHERE id_usuarios = %s
+        AND ativo = TRUE
     """
 
     valores = (
@@ -170,3 +150,26 @@ def atualizar_senha_usuario(
 
     cursor.close()
     conexao.close()
+
+def desativar_usuario_repository(usuario_id):
+
+    conexao = conectar_banco()
+
+    cursor = conexao.cursor()
+
+    query = """
+        UPDATE tbl_usuarios
+        SET ativo = FALSE
+        WHERE id_usuarios = %s
+    """
+
+    cursor.execute(query, (usuario_id,))
+
+    conexao.commit()
+
+    linhas_afetadas = cursor.rowcount
+
+    cursor.close()
+    conexao.close()
+
+    return linhas_afetadas > 0

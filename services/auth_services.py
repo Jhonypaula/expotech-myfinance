@@ -11,7 +11,9 @@ from repository.auth_repository import (
     buscar_usuario_por_email, 
     criar_usuario, 
     buscar_usuario_cadastrado,
-    buscar_usuario_por_login
+    buscar_usuario_por_login,
+    desativar_usuario_repository,
+    verificar_status_conta
 )
 
 from utils.security import hash_senha
@@ -121,7 +123,26 @@ def login_usuario_service(
             print('\nEmail ou senha invalidos!')
             return None
 
+        status_ativo = verificar_status_conta(
+            usuario[0]
+        )
+
+        if not status_ativo:
+
+            print(
+                '\n❌ Conta desativada!'
+                '\n📌 Entre em contato com o suporte.'
+            )
+
+            return None
+
         return usuario
     
     except Exception as e:
         print(f"Erro interno: {e}")
+
+def desativar_usuario_service(usuario_id):
+
+    return desativar_usuario_repository(
+        usuario_id
+    )
