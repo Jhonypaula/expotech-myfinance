@@ -66,17 +66,17 @@ INSERT INTO tbl_categorias (
     descricao_categorias
 )
 VALUES
-('Alimentacao', 'Gastos com mercado, restaurantes e comida'),
-('Transporte', 'Uber, gasolina, ônibus e transporte público'),
-('Salario', 'Entradas salariais e pagamentos recebidos'),
-('Lazer', 'Cinema, jogos, streaming e entretenimento'),
-('Saude', 'Farmácia, consultas e exames'),
-('Educacao', 'Cursos, faculdade e materiais de estudo'),
-('Moradia', 'Aluguel, condomínio e contas da casa'),
-('Investimentos', 'Aplicações financeiras e investimentos'),
-('Compras', 'Roupas, eletrônicos e compras em geral'),
-('Assinaturas', 'Netflix, Spotify e serviços recorrentes'),
-('Transferencias', 'PIX, TED e transferências bancárias'),
-('Outros', 'Transações diversas que não se encaixam nas demais categorias');
+('Alimentacao', 'Ifood e comida'),
+('Transporte', 'Uber e gasolina'),
+('Salario', 'Entradas salariais'),
+('Lazer', 'Cinema e streaming'),
+('Saude', 'Farmácia'),
+('Educacao', 'Cursos e faculdade'),
+('Moradia', 'Gastos com moradia'),
+('Investimentos', 'Tigrinho'),
+('Compras', 'Compras em geral'),
+('Assinaturas', 'Netflix e HBO'),
+('Transferencias', 'PIX e TED'),
+('Outros', 'Outras Transações');
 
 

@@ -280,7 +280,7 @@ def filtrar_transacoes_descricao_repository(
             t.valor_transacoes,
             t.descricao_transacoes,
             c.nome_categorias,
-            t.data_transacoes
+            t.data_transacao
 
         FROM tbl_transacoes t
 

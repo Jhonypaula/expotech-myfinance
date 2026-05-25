@@ -1,3 +1,5 @@
+import os
+
 from services.auth_services import (
     cadastrar_usuario_service,
     login_usuario_service,
@@ -46,13 +48,18 @@ from utils.regex_validators import (
 
 usuario_logado = None
 
+def limpar_tela():
+    os.system(
+        "cls" if os.name == "nt" else "clear"
+    )
+
 def tela_cadastro():
 
     global usuario_logado
 
-    nome_usuario = input('\nDigite seu nome para cadastrar: ')
-    email_usuario = input('\nDigite seu email para cadastrar: ')
-    senha_usuario = input('\nDigite sua senha para cadastrar: ')
+    nome_usuario = input('\n👤 Digite seu nome: ')
+    email_usuario = input('\n📧 Digite seu email: ')
+    senha_usuario = input('\n🔒 Digite sua senha: ')
 
     cadastro = cadastrar_usuario_service(
         nome_usuario,
@@ -65,19 +72,21 @@ def tela_cadastro():
         usuario_logado = cadastro
 
         print('\nCadastro realizado com sucesso!')
+        pausar_tela()
 
         return usuario_logado
 
     else:
         print('\nErro ao cadastrar usuario!')
+        pausar_tela()
         return None
 
 def tela_login():
 
     global usuario_logado
 
-    email_usuario = input('\nDigite seu email para login: ')
-    senha_usuario = input('\nDigite sua senha para login: ')
+    email_usuario = input('\n📧 Digite seu email: ')
+    senha_usuario = input('\n🔒 Digite sua senha: ')
 
     usuario = login_usuario_service(
         email_usuario,
@@ -89,11 +98,13 @@ def tela_login():
         usuario_logado = usuario
 
         print('\nLogin realizado com sucesso!')
+        pausar_tela()
 
         return usuario
 
     else:
         print('\nErro ao fazer login!')
+        pausar_tela()
         return None
 
 def logout():
@@ -103,17 +114,18 @@ def logout():
     usuario_logado = None
 
     print('\nLogout realizado com sucesso!')
+    pausar_tela()
 
 def criar_conta(usuario_id):
 
-    nome_conta = input('\nDigite o nome da conta: ')
+    nome_conta = input('\n🏦 Digite o nome da conta: ')
 
     tipo_conta = input(
-        '\nDigite o tipo da conta (corrente, poupanca, carteira): '
+        '\n📁 Digite o tipo da conta (corrente, poupanca, carteira): '
     ).strip().lower()
 
     saldo_inicial_str = input(
-        '\nDigite o saldo inicial da conta: '
+        '\n💰 Digite o saldo inicial da conta: '
     )
 
     conta_criada = cadastrar_conta_service(
@@ -125,14 +137,16 @@ def criar_conta(usuario_id):
 
     if conta_criada:
 
-        print('\nConta criada com sucesso!')
+        print('\n✅ Conta criada com sucesso!')
+        pausar_tela()
         return True
 
     else:
-        print('\nErro ao criar conta!')
+        print('\n⚠️ Erro ao criar conta!')
+        pausar_tela()
         return None
 
-def listar_contas(usuario_id):
+def listar_contas(usuario_id, pausar=True):
 
     contas = listar_contas_service(usuario_id)
 
@@ -141,6 +155,7 @@ def listar_contas(usuario_id):
         print('\n⚠️ Nenhuma conta encontrada!')
         return None
 
+    limpar_tela()
     print("\n╔══════════════════════════════════════════════╗")
     print("║               💳️ SUAS CONTAS 💳️              ║")
     print("╚══════════════════════════════════════════════╝")
@@ -165,29 +180,29 @@ def listar_contas(usuario_id):
         print(f"║ 📁️ Tipo: {tipo_conta}")
         print(f"║ 💵️ Saldo: R$ {saldo_conta:.2f}")
         print(f"╚══════════════════════════════════════════════╝")
-        
+    if pausar:    
         pausar_tela()
 
     return contas
 
 def editar_conta(usuario_id):
 
-    contas = listar_contas(usuario_id)
+    contas = listar_contas(usuario_id, pausar=False)
 
     if not contas:
         return None
 
     try:
-        id_conta = int(input("\nDigite o ID da conta: "))
+        id_conta = int(input("\n🆔 Digite o ID da conta: "))
 
     except ValueError:
         print("\nID invalido!")
         return None
 
-    novo_nome = input("\nDigite o novo nome da conta: ")
+    novo_nome = input("\n🏦 Digite o novo nome da conta: ")
 
     novo_tipo = input(
-        "\nDigite o novo tipo da conta (corrente, poupanca, carteira): "
+        "\n📁 Digite o novo tipo da conta (corrente, poupanca, carteira): "
     ).strip().lower()
 
     conta_editada = editar_conta_service(
@@ -198,38 +213,39 @@ def editar_conta(usuario_id):
     )
 
     if conta_editada:
-        print("\nConta editada com sucesso!")
+        print("\n✅ Conta editada com sucesso!")
+        pausar_tela()
         return True
 
     else:
-        print("\nErro ao editar conta.")
+        print("\n⚠️ Erro ao editar conta.")
+        pausar_tela()
         return None
 
 def excluir_conta(usuario_id):
 
-    print("\n===== EXCLUIR CONTA =====")
-
-    contas = listar_contas(usuario_id)
+    contas = listar_contas(usuario_id, pausar=False)
 
     if not contas:
         return None
 
     try:
         id_conta = int(
-            input("\nDigite o ID da conta que deseja excluir: ")
+            input("\n🆔 Digite o ID da conta que deseja excluir: ")
         )
 
     except ValueError:
-        print("\nID invalido!")
+        print("\n❌ ID invalido!")
         return None
 
     confirmacao = input(
-        "\nTem certeza que deseja excluir esta conta? (s/n): "
+        "\n⚠️ Tem certeza que deseja excluir esta conta? (s/n): "
     ).strip().lower()
 
     if confirmacao != "s":
 
-        print("\nExclusao cancelada.")
+        print("\n❌ Exclusao cancelada.")
+        pausar_tela()
         return None
 
     conta_excluida = excluir_conta_service(
@@ -239,47 +255,57 @@ def excluir_conta(usuario_id):
 
     if conta_excluida:
 
-        print("\nConta excluida com sucesso!")
+        print("\n✅ Conta excluida com sucesso!")
+        pausar_tela()
         return True
 
     else:
-        print("\nErro ao excluir conta.")
+        print("\n⚠️ Erro ao excluir conta.")
+        pausar_tela()
         return None
 
 def listar_categorias():
-
+ 
     categorias = listar_categorias_service()
-
+ 
     if not categorias:
-
-        print("\nNenhuma categoria encontrada!")
+ 
+        print("\n⚠️ Nenhuma categoria encontrada!")
         return None
 
-    print("\n===== CATEGORIAS =====")
+    limpar_tela()
+    print("\n╔════════════════════════════════════════════════╗")
+    print("║            🏷️  CATEGORIAS  🏷️                    ║")
+    print("╠═══════╦═══════════════════╦════════════════════╣")
+    print("║  ID   ║  Nome             ║  Descricao         ║")
+    print("╠═══════╬═══════════════════╬════════════════════╣")
+    
 
     for categoria in categorias:
-
+ 
         id_categoria = categoria[0]
         nome_categoria = categoria[1]
         descricao_categoria = categoria[2]
-
+ 
         print(
-            f"ID: {id_categoria:<5} | "
-            f"Nome: {nome_categoria:<15} | "
-            f"Descricao: {descricao_categoria}"
+            f"║ {id_categoria:<5} ║"
+            f" {nome_categoria:<17} ║"
+            f" {descricao_categoria:<18} ║"
         )
-
+ 
+    print("╚═══════╩═══════════════════╩════════════════════╝")
+ 
     return categorias
 
 def criar_transacao(usuario_id):
 
-    contas = listar_contas(usuario_id)
+    contas = listar_contas(usuario_id, pausar=False)
 
     if not contas:
         return None
 
     try:
-        conta_id = int(input("\nDigite o ID da conta: "))
+        conta_id = int(input("\n🆔 Digite o ID da conta: "))
 
     except ValueError:
         print("\nID invalido!")
@@ -305,7 +331,7 @@ def criar_transacao(usuario_id):
 
     try:
         categoria_id = int(
-            input("\nDigite o ID da categoria: ")
+            input("\n🏷️ Digite o ID da categoria: ")
         )
 
     except ValueError:
@@ -324,15 +350,15 @@ def criar_transacao(usuario_id):
         return None
 
     tipo_transacao = input(
-        "\nDigite o tipo de transacao (entrada/saida): "
+        "\n🔄 Digite o tipo de transacao (entrada/saida): "
     ).strip().lower()
 
     valor_transacao = input(
-        "\nDigite o valor da transacao: "
+        "\n💰 Digite o valor da transacao: "
     )
 
     descricao_transacao = input(
-        "\nDigite a descricao da transacao: "
+        "\n📝 Digite a descricao da transacao: "
     )
 
     transacao = criar_transacao_service(
@@ -347,25 +373,30 @@ def criar_transacao(usuario_id):
     if transacao:
 
         print("\nTransacao criada com sucesso!")
+
+        pausar_tela()
         return True
 
     else:
         print("\nErro ao criar transacao.")
+
+        pausar_tela()
         return None
 
 def listar_transacoes(
     usuario_id,
-    conta_id=None
+    conta_id=None,
+    pausar=True
 ):
     if conta_id is None:
 
-        contas = listar_contas(usuario_id)
+        contas = listar_contas(usuario_id, pausar=False)
 
         if not contas:
             return None
 
         try:
-            conta_id = int(input("\nDigite o ID da conta: "))
+            conta_id = int(input("\n🆔 Digite o ID da conta: "))
 
         except ValueError:
             print("\n❌️ ID invalido!")
@@ -381,6 +412,7 @@ def listar_transacoes(
         print("\n⚠️ Nenhuma transacao encontrada!")
         return None
 
+    limpar_tela()
     print("\n╔══════════════════════════════════════════════╗")
     print("║               💸️ TRANSACOES 💸️                ║")
     print("╚══════════════════════════════════════════════╝")
@@ -409,20 +441,20 @@ def listar_transacoes(
         print(f"║ 📝️ Descricao: {descricao_transacao}")
         print(f"║ 🗓️ Data: {data}")
         print(f"╚══════════════════════════════════════════════╝")
-        
+    if pausar:    
         pausar_tela()
 
     return transacoes
 
 def excluir_transacao(usuario_id):
 
-    contas = listar_contas(usuario_id)
+    contas = listar_contas(usuario_id, pausar=False)
 
     if not contas:
         return None
 
     try:
-        conta_id = int(input("\nDigite o ID da conta: "))
+        conta_id = int(input("\n🆔 Digite o ID da conta: "))
 
     except ValueError:
         print("\nID invalido!")
@@ -443,7 +475,8 @@ def excluir_transacao(usuario_id):
 
     transacoes = listar_transacoes(
         usuario_id,
-        conta_id
+        conta_id,
+        pausar=False
     )
 
     if not transacoes:
@@ -451,7 +484,7 @@ def excluir_transacao(usuario_id):
 
     try:
         id_transacao = int(
-            input("\nDigite o ID da transacao: ")
+            input("\n🆔 Digite o ID da transacao: ")
         )
 
     except ValueError:
@@ -459,12 +492,13 @@ def excluir_transacao(usuario_id):
         return None
 
     confirmacao = input(
-        "\nTem certeza que deseja excluir esta transacao? (s/n): "
+        "\n⚠️ Tem certeza que deseja excluir esta transacao? (s/n): "
     ).strip().lower()
 
     if confirmacao != "s":
 
         print("\nExclusao cancelada.")
+        pausar_tela()
         return None
 
     transacao_excluida = excluir_transacao_service(
@@ -476,23 +510,25 @@ def excluir_transacao(usuario_id):
     if transacao_excluida:
 
         print("\nTransacao excluida com sucesso!")
+
+        pausar_tela()
         return True
 
     else:
         print("\nErro ao excluir transacao.")
+
+        pausar_tela()
         return None
-    
-    pausar_tela()
 
 def editar_transacao(usuario_id):
 
-    contas = listar_contas(usuario_id)
+    contas = listar_contas(usuario_id, pausar=False)
 
     if not contas:
         return None
 
     try:
-        conta_id = int(input("\nDigite o ID da conta: "))
+        conta_id = int(input("\n🆔 Digite o ID da conta: "))
 
     except ValueError:
         print("\nID invalido!")
@@ -500,7 +536,8 @@ def editar_transacao(usuario_id):
 
     transacoes = listar_transacoes(
         usuario_id,
-        conta_id
+        conta_id,
+        pausar=False
     )
 
     if not transacoes:
@@ -508,7 +545,7 @@ def editar_transacao(usuario_id):
 
     try:
         id_transacao = int(
-            input("\nDigite o ID da transacao: ")
+            input("\n🆔 Digite o ID da transacao: ")
         )
 
     except ValueError:
@@ -532,7 +569,7 @@ def editar_transacao(usuario_id):
 
     try:
         categoria_id = int(
-            input("\nDigite o ID da categoria: ")
+            input("\n🏷️ Digite o ID da categoria: ")
         )
 
     except ValueError:
@@ -550,24 +587,25 @@ def editar_transacao(usuario_id):
         return None
 
     tipo_transacao = input(
-        "\nDigite o tipo de transacao (entrada/saida): "
+        "\n🔄 Digite o tipo de transacao (entrada/saida): "
     ).strip().lower()
 
     valor_transacao_str = input(
-        "\nDigite o valor da transacao: "
+        "\n💰 Digite o valor da transacao: "
     )
 
     descricao_transacao = input(
-        "\nDigite a descricao da transacao: "
+        "\n📝 Digite a descricao da transacao: "
     )
 
     confirmacao = input(
-        "\nTem certeza que deseja editar esta transacao? (s/n): "
+        "\n⚠️ Tem certeza que deseja editar esta transacao? (s/n): "
     ).strip().lower()
 
     if confirmacao != "s":
 
         print("\nEdicao cancelada.")
+        pausar_tela()
         return None
 
     transacao_editada = editar_transacao_service(
@@ -583,24 +621,26 @@ def editar_transacao(usuario_id):
     if transacao_editada:
 
         print("\nTransacao editada com sucesso!")
+        pausar_tela()
+
         return True
 
     else:
         print("\nErro ao editar transacao.")
+        pausar_tela()
+
         return None
-    
-    pausar_tela()
 
 def filtrar_transacoes_tipo(usuario_id):
 
-    contas = listar_contas(usuario_id)
+    contas = listar_contas(usuario_id, pausar=False)
 
     if not contas:
         return None
 
     try:
         conta_id = int(
-            input("\nDigite o ID da conta: ")
+            input("\n🆔 Digite o ID da conta: ")
         )
 
     except ValueError:
@@ -622,7 +662,7 @@ def filtrar_transacoes_tipo(usuario_id):
         return None
 
     tipo_transacao = input(
-        "\nDigite o tipo de transacao (entrada/saida): "
+        "\n🔄 Digite o tipo de transacao (entrada/saida): "
     ).strip().lower()
 
     transacoes = filtrar_transacoes_tipo_service(
@@ -635,6 +675,7 @@ def filtrar_transacoes_tipo(usuario_id):
         print("\nNenhuma transacao encontrada!")
         return None
 
+    limpar_tela()
     print("\n╔══════════════════════════════════════════════╗")
     print("║         🔎 TRANSACOES FILTRADAS 🔎         ║")
     print("╚══════════════════════════════════════════════╝")
@@ -670,18 +711,18 @@ def filtrar_transacoes_tipo(usuario_id):
         print(f"║ 📅 Data: {data}")
         print(f"╚══════════════════════════════════════╝")
         
-        pausar_tela()
+    pausar_tela()
 
 def filtrar_transacoes_categoria(usuario_id):
 
-    contas = listar_contas(usuario_id)
+    contas = listar_contas(usuario_id, pausar=False)
 
     if not contas:
         return None
     
     try:
         conta_id = int(
-            input("\nDigite o ID da conta: ")
+            input("\n🆔 Digite o ID da conta: ")
         )
 
     except ValueError:
@@ -709,7 +750,7 @@ def filtrar_transacoes_categoria(usuario_id):
 
     try:
         categoria_id = int(
-            input("\nDigite o ID da categoria: ")
+            input("\n🏷️ Digite o ID da categoria: ")
         )
 
     except ValueError:
@@ -739,6 +780,7 @@ def filtrar_transacoes_categoria(usuario_id):
         print("\nNenhuma transacao encontrada!")
         return None
 
+    limpar_tela()
     print("\n╔══════════════════════════════════════════════╗")
     print("║         🔎 TRANSACOES FILTRADAS 🔎         ║")
     print("╚══════════════════════════════════════════════╝")
@@ -774,18 +816,18 @@ def filtrar_transacoes_categoria(usuario_id):
         print(f"║ 📅 Data: {data}")
         print(f"╚════════════════════════════════════╝")
         
-        pausar_tela()
+    pausar_tela()
 
 def filtrar_transacoes_descricao(usuario_id):
 
-    contas = listar_contas(usuario_id)
+    contas = listar_contas(usuario_id, pausar=False)
 
     if not contas:
         return None
 
     try:
         conta_id = int(
-            input("\nDigite o ID da conta: ")
+            input("\n🆔 Digite o ID da conta: ")
         )
 
     except ValueError:
@@ -807,7 +849,7 @@ def filtrar_transacoes_descricao(usuario_id):
         return None
 
     descricao = input(
-        "\nDigite a descricao para buscar: "
+        "\n🔍 Digite a descricao para buscar: "
     ).strip().lower()
 
     transacoes = (
@@ -823,6 +865,7 @@ def filtrar_transacoes_descricao(usuario_id):
         print("\nNenhuma transacao encontrada!")
         return None
 
+    limpar_tela()
     print("\n╔══════════════════════════════════════════════╗")
     print("║         🔎 TRANSACOES FILTRADAS 🔎         ║")
     print("╚══════════════════════════════════════════════╝")
@@ -849,20 +892,16 @@ def filtrar_transacoes_descricao(usuario_id):
             else "📉"
         )
 
-        print(
-            f"""
-    ╔════════════════════════════════════╗
-    ║ 🆔 ID: {id_transacao:<28}
-    ║ {emoji_tipo} Tipo: {tipo:<24}
-    ║ 💰 Valor: R$ {valor:<18.2f}
-    ║ 📂 Categoria: {categoria:<18}
-    ║ 📝 Descricao: {descricao:<17}
-    ║ 📅 Data: {data:<23}
-    ╚════════════════════════════════════╝
-    """
-        )
+        print(f"╔════════════════════════════════════╗")
+        print(f"║ 🆔 ID: {id_transacao}")
+        print(f"║ {emoji_tipo} Tipo: {tipo}")
+        print(f"║ 💰 Valor: R$ {valor:.2f}")
+        print(f"║ 📂 Categoria: {categoria}")
+        print(f"║ 📝 Descricao: {descricao}")
+        print(f"║ 📅 Data: {data}")
+        print(f"╚════════════════════════════════════╝")
         
-        pausar_tela()
+    pausar_tela()
 
 def mostrar_dashboard(usuario_id):
 
@@ -890,8 +929,9 @@ def mostrar_dashboard(usuario_id):
         usuario_id
     )
 
+    limpar_tela()
     print("\n╔══════════════════════════════════════════════╗")
-    print("║            📊 DASHBOARD 📊                 ║")
+    print("║            📊 DASHBOARD 📊                   ║")
     print("╚══════════════════════════════════════════════╝")
 
     print(f"\n💰 Saldo Total : R$ {saldo_total:.2f}")
@@ -930,9 +970,12 @@ def mostrar_dashboard(usuario_id):
 
             total_gasto = float(categoria[1])
 
-            porcentagem = (
-                total_gasto / total_saidas
-            ) * 100
+            if total_saidas > 0:
+                porcentagem = (
+                    total_gasto / total_saidas
+                ) * 100
+            else:
+                porcentagem = 0
 
             barra = "█" * int(
                 porcentagem / 5
@@ -951,12 +994,13 @@ def mostrar_dashboard(usuario_id):
 
 def tela_esqueci_senha():
     
+    limpar_tela()
     print("\n╔══════════════════════════════════════════════╗")
-    print("║            🔐️ RECUPERAR SENHA 🔐️               ║")
+    print("║            🔐️ RECUPERAR SENHA 🔐️             ║")
     print("╚══════════════════════════════════════════════╝")
     
     email = input(
-        "\nDigite seu email: "
+        "\n📧 Digite seu email: "
     ).strip().lower()
     
     usuario = buscar_usuario_por_email(
@@ -974,7 +1018,7 @@ def tela_esqueci_senha():
     if usuario:
         
         redefinir = input(
-            "\nDeseja redefinir a senha agora? (s/n): "
+            "\n🔑 Deseja redefinir a senha agora? (s/n): "
         ).strip().lower()
     
         if redefinir == "s":
@@ -993,6 +1037,7 @@ def tela_esqueci_senha():
 
 def tela_resetar_senha():
     
+    limpar_tela()
     print("\n╔══════════════════════════════════════════════╗")
     print("║            ♻️ RESETAR SENHA ♻️               ║")
     print("╚══════════════════════════════════════════════╝")
@@ -1000,7 +1045,7 @@ def tela_resetar_senha():
     while True:
     
         token = input(
-            "\nDigite o token recebido (ou 0 para cancelar): "
+            "\n🔑 Digite o token recebido (ou 0 para cancelar): "
         ).strip()
         
         if token == "0":
@@ -1028,7 +1073,7 @@ def tela_resetar_senha():
     while True:
         
         nova_senha = input(
-            "\nDigite a nova senha (ou 0 para cancelar): "
+            "\n🔒 Digite a nova senha (ou 0 para cancelar): "
         )
         if nova_senha == "0":
             
@@ -1072,7 +1117,7 @@ def tela_resetar_senha():
 def pausar_tela():
     
     input(
-        "\n📌️ Pressione ENTER para voltar ao meno . . ."
+        "\n📌️ Pressione ENTER para voltar ao menu . . ."
     )
     
 # =====================================
@@ -1081,6 +1126,7 @@ def pausar_tela():
 
 def menu_deslogado():
 
+    limpar_tela()
     print("\n╔══════════════════════════════════════════════╗")
     print("║               💰 MY FINANCE 💰               ║")
     print("╠══════════════════════════════════════════════╣")
@@ -1094,11 +1140,13 @@ def menu_deslogado():
 
 def menu_logado():
 
+    limpar_tela()
     print("\n╔══════════════════════════════════════════════╗")
     print(f"║ 👋️ Bem-Vindo, {usuario_logado[1]:<22}         ║")
     print("╠══════════════════════════════════════════════╣")
     print("║  1 ➜ Contas                                  ║")
     print("║  2 ➜ Transacoes                              ║")
+    print("║  3 ➜ Dashboard                               ║")
     print("║  4 ➜ Logout                                  ║")
     print("║  5 ➜ Sair                                    ║")
     print("╚══════════════════════════════════════════════╝")
@@ -1107,11 +1155,13 @@ def menu_logado():
 
 def menu_contas():
 
+    limpar_tela()
     print("\n╔══════════════════════════════════════════════╗")
     print("║            💳️ GESTAO DE CONTAS 💳️            ║")
     print("╠══════════════════════════════════════════════╣")
     print("║  1 ➜ Criar conta                             ║")
     print("║  2 ➜ Listar contas                           ║")
+    print("║  3 ➜ Editar conta                            ║")
     print("║  4 ➜ Excluir conta                           ║")
     print("║  5 ➜ Voltar                                  ║")
     print("╚══════════════════════════════════════════════╝")
@@ -1120,6 +1170,7 @@ def menu_contas():
 
 def menu_transacoes():
 
+    limpar_tela()
     print("\n╔══════════════════════════════════════════════╗")
     print("║               💸️  TRANSACOES 💸️              ║")
     print("╠══════════════════════════════════════════════╣")
@@ -1135,13 +1186,14 @@ def menu_transacoes():
 
 def menu_filtrar_transacoes():
 
+    limpar_tela()
     print("\n╔══════════════════════════════════════════════╗")
-    print("║          🔎️ FILTRAR TRANSACOES 🔎️              ║")
+    print("║          🔎️ FILTRAR TRANSACOES 🔎️            ║")
     print("╠══════════════════════════════════════════════╣")
-    print("║  1 ➜ Filtrar por tipo                          ║")
-    print("║  2 ➜ Filtrar por categoria                     ║")
-    print("║  3 ➜ Buscar por descricao                      ║")
-    print("║  4 ➜ Voltar                                    ║")
+    print("║  1 ➜ Filtrar por tipo                        ║")
+    print("║  2 ➜ Filtrar por categoria                   ║")
+    print("║  3 ➜ Buscar por descricao                    ║")
+    print("║  4 ➜ Voltar                                  ║")
     print("╚══════════════════════════════════════════════╝")
 
     return input("\n👉 Escolha uma opcao: ")
@@ -1165,6 +1217,7 @@ def main():
                 tela_esqueci_senha()
             
             elif opcao == '4':
+                limpar_tela()
                 print("\nSaindo do sistema . . .")
                 break
 
@@ -1250,6 +1303,7 @@ def main():
 
             elif opcao == "5":
 
+                limpar_tela()
                 print('\nSaindo do sistema...')
                 break
 
