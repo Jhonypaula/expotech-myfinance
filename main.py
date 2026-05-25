@@ -1003,37 +1003,25 @@ def tela_esqueci_senha():
         "\n📧 Digite seu email: "
     ).strip().lower()
     
-    usuario = buscar_usuario_por_email(
-        email
-    )
+    usuario = buscar_usuario_por_email(email)
     
-    requisicao_alterar_senha(
-        email
-    )
+    if not usuario:
+        print("\n❌️ Email não encontrado!")
+        pausar_tela()
+        return None
     
-    print(
-        "\n📩️ Se o email existir, um token foi enviado."
-    )
+    requisicao_alterar_senha(email)
     
-    if usuario:
-        
-        redefinir = input(
-            "\n🔑 Deseja redefinir a senha agora? (s/n): "
-        ).strip().lower()
+    print("\n📩️ Token de recuperação enviado para o seu email.")
     
-        if redefinir == "s":
-            
-            tela_resetar_senha()
-            
-        else:
-            print(
-                "\n📌️ Voce pode redefinir a senha depois pelo menu."
-            )
-        
+    redefinir = input(
+        "\n🔑 Deseja redefinir a senha agora? (s/n): "
+    ).strip().lower()
+    
+    if redefinir == "s":
+        tela_resetar_senha()
     else:
-        print(
-            "\n❌️ Erro ao solicitar recuperacao de senha!"
-        )
+        print("\n📌️ Voce pode redefinir a senha depois pelo menu.")
 
 def tela_resetar_senha():
     

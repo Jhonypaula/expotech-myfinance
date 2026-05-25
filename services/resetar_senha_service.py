@@ -45,7 +45,7 @@ def requisicao_alterar_senha(email):
             datetime.now() +
             timedelta(minutes=15)
         )
-        
+
         invalidar_tokens_anteriores(
             usuario["id_usuarios"]
         )
@@ -57,18 +57,105 @@ def requisicao_alterar_senha(email):
         )
 
         body = f"""
-            Olá.
+        <html>
+            <body style="
+                margin:0;
+                padding:0;
+                background-color:#f4f7fb;
+                font-family:Arial, sans-serif;
+            ">
 
-            Seu token de recuperação é:
+                <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td align="center" style="padding:40px 20px;">
 
-            {token}
+                            <table width="500" cellpadding="0" cellspacing="0" style="
+                                background:#ffffff;
+                                border-radius:16px;
+                                padding:40px;
+                                box-shadow:0 4px 12px rgba(0,0,0,0.08);
+                            ">
 
-            Esse token expira em 15 minutos.
+                                <tr>
+                                    <td align="center">
+
+                                        <h1 style="
+                                            margin:0;
+                                            color:#111827;
+                                            font-size:28px;
+                                        ">
+                                            🔐 Recuperação de Senha
+                                        </h1>
+
+                                        <p style="
+                                            color:#6b7280;
+                                            font-size:16px;
+                                            margin-top:15px;
+                                            line-height:1.6;
+                                        ">
+                                            Recebemos uma solicitação para redefinir sua senha.
+                                        </p>
+
+                                        <div style="
+                                            margin:30px 0;
+                                            background:#f3f4f6;
+                                            padding:20px;
+                                            border-radius:12px;
+                                        ">
+
+                                            <p style="
+                                                margin:0;
+                                                color:#6b7280;
+                                                font-size:14px;
+                                            ">
+                                                Seu código de recuperação:
+                                            </p>
+
+                                            <h2 style="
+                                                margin:10px 0 0 0;
+                                                font-size:36px;
+                                                letter-spacing:6px;
+                                                color:#2563eb;
+                                            ">
+                                                {token}
+                                            </h2>
+
+                                        </div>
+
+                                        <p style="
+                                            color:#6b7280;
+                                            font-size:14px;
+                                            line-height:1.6;
+                                        ">
+                                            Esse código expira em <strong>15 minutos</strong>.
+                                        </p>
+
+                                        <p style="
+                                            margin-top:30px;
+                                            font-size:13px;
+                                            color:#9ca3af;
+                                            line-height:1.5;
+                                        ">
+                                            Caso você não tenha solicitado a recuperação de senha,
+                                            ignore este e-mail.
+                                        </p>
+
+                                    </td>
+                                </tr>
+
+                            </table>
+
+                        </td>
+                    </tr>
+                </table>
+
+            </body>
+        </html>
         """
 
         send_email(
             email,
-            "Recuperação de senha",
+            "🔐 Recuperação de senha",
             body
         )
 
