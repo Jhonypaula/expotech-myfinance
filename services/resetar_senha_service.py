@@ -57,100 +57,217 @@ def requisicao_alterar_senha(email):
         )
 
         body = f"""
-        <html>
+        <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Recuperação de Senha</title>
+            </head>
+
             <body style="
-                margin:0;
-                padding:0;
-                background-color:#f4f7fb;
-                font-family:Arial, sans-serif;
+            margin:0;
+            padding:0;
+            background-color:#0d1117;
+            font-family:Arial, Helvetica, sans-serif;
             ">
 
-                <table width="100%" cellpadding="0" cellspacing="0">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                    style="padding:40px 16px;background-color:#0d1117;">
+
+                <tr>
+                <td align="center">
+
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                        style="
+                            max-width:560px;
+                            background-color:#161b22;
+                            border-radius:18px;
+                            overflow:hidden;
+                            border:1px solid #21262d;
+                        ">
+
+                    <!-- HEADER -->
                     <tr>
-                        <td align="center" style="padding:40px 20px;">
+                        <td style="
+                        padding:40px 48px;
+                        background-color:#11161c;
+                        border-bottom:1px solid #21262d;
+                        text-align:center;
+                        ">
 
-                            <table width="500" cellpadding="0" cellspacing="0" style="
-                                background:#ffffff;
-                                border-radius:16px;
-                                padding:40px;
-                                box-shadow:0 4px 12px rgba(0,0,0,0.08);
-                            ">
+                        <div style="
+                            width:60px;
+                            height:60px;
+                            line-height:60px;
+                            border-radius:50%;
+                            background-color:#1f6feb20;
+                            border:1px solid #1f6feb50;
+                            display:inline-block;
+                            font-size:28px;
+                            margin-bottom:18px;
+                        ">
+                            🔐
+                        </div>
 
-                                <tr>
-                                    <td align="center">
+                        <h1 style="
+                            margin:0;
+                            color:#f0f6fc;
+                            font-size:28px;
+                            font-weight:700;
+                        ">
+                            Recuperação de Senha
+                        </h1>
 
-                                        <h1 style="
-                                            margin:0;
-                                            color:#111827;
-                                            font-size:28px;
-                                        ">
-                                            🔐 Recuperação de Senha
-                                        </h1>
-
-                                        <p style="
-                                            color:#6b7280;
-                                            font-size:16px;
-                                            margin-top:15px;
-                                            line-height:1.6;
-                                        ">
-                                            Recebemos uma solicitação para redefinir sua senha.
-                                        </p>
-
-                                        <div style="
-                                            margin:30px 0;
-                                            background:#f3f4f6;
-                                            padding:20px;
-                                            border-radius:12px;
-                                        ">
-
-                                            <p style="
-                                                margin:0;
-                                                color:#6b7280;
-                                                font-size:14px;
-                                            ">
-                                                Seu código de recuperação:
-                                            </p>
-
-                                            <h2 style="
-                                                margin:10px 0 0 0;
-                                                font-size:36px;
-                                                letter-spacing:6px;
-                                                color:#2563eb;
-                                            ">
-                                                {token}
-                                            </h2>
-
-                                        </div>
-
-                                        <p style="
-                                            color:#6b7280;
-                                            font-size:14px;
-                                            line-height:1.6;
-                                        ">
-                                            Esse código expira em <strong>15 minutos</strong>.
-                                        </p>
-
-                                        <p style="
-                                            margin-top:30px;
-                                            font-size:13px;
-                                            color:#9ca3af;
-                                            line-height:1.5;
-                                        ">
-                                            Caso você não tenha solicitado a recuperação de senha,
-                                            ignore este e-mail.
-                                        </p>
-
-                                    </td>
-                                </tr>
-
-                            </table>
+                        <p style="
+                            margin:12px 0 0;
+                            color:#8b949e;
+                            font-size:15px;
+                            line-height:1.6;
+                        ">
+                            Recebemos uma solicitação para redefinir a senha da sua conta.
+                        </p>
 
                         </td>
                     </tr>
-                </table>
+
+                    <!-- BODY -->
+                    <tr>
+                        <td style="padding:42px 48px;">
+
+                        <p style="
+                            margin:0 0 24px;
+                            color:#c9d1d9;
+                            font-size:15px;
+                            line-height:1.7;
+                        ">
+                            Utilize o código abaixo para continuar com a redefinição da sua senha.
+                            Por segurança, esse código é temporário e válido por apenas alguns minutos.
+                        </p>
+
+                        <!-- TOKEN -->
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                                style="margin-bottom:28px;">
+
+                            <tr>
+                            <td align="center" style="
+                                background-color:#0d1117;
+                                border:1px solid #30363d;
+                                border-radius:14px;
+                                padding:28px 20px;
+                            ">
+
+                                <p style="
+                                margin:0 0 12px;
+                                color:#8b949e;
+                                font-size:12px;
+                                letter-spacing:2px;
+                                text-transform:uppercase;
+                                ">
+                                Código de recuperação
+                                </p>
+
+                                <div style="
+                                color:#58a6ff;
+                                font-size:38px;
+                                font-weight:700;
+                                letter-spacing:10px;
+                                font-family:'Courier New', monospace;
+                                ">
+                                {token}
+                                </div>
+
+                                <p style="
+                                margin:18px 0 0;
+                                color:#8b949e;
+                                font-size:13px;
+                                ">
+                                Expira em <strong style="color:#f0f6fc;">15 minutos</strong>
+                                </p>
+
+                            </td>
+                            </tr>
+
+                        </table>
+
+                        <p style="
+                            margin:0 0 32px;
+                            color:#8b949e;
+                            font-size:14px;
+                            line-height:1.7;
+                        ">
+                            Caso você não tenha solicitado a recuperação de senha,
+                            nenhuma ação é necessária. Sua conta continuará segura.
+                        </p>
+
+                        <!-- ALERT -->
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+
+                            <tr>
+                            <td style="
+                                background-color:#1c2128;
+                                border:1px solid #30363d;
+                                border-radius:12px;
+                                padding:18px 20px;
+                            ">
+
+                                <p style="
+                                margin:0;
+                                color:#c9d1d9;
+                                font-size:13px;
+                                line-height:1.7;
+                                ">
+                                <strong style="color:#58a6ff;">Dica de segurança:</strong>
+                                nunca compartilhe este código com outras pessoas.
+                                Nossa equipe nunca solicitará sua senha ou token por e-mail.
+                                </p>
+
+                            </td>
+                            </tr>
+
+                        </table>
+
+                        </td>
+                    </tr>
+
+                    <!-- FOOTER -->
+                    <tr>
+                        <td style="
+                        padding:24px 40px;
+                        background-color:#11161c;
+                        border-top:1px solid #21262d;
+                        text-align:center;
+                        ">
+
+                        <p style="
+                            margin:0 0 8px;
+                            color:#6e7681;
+                            font-size:12px;
+                            line-height:1.6;
+                        ">
+                            Este é um e-mail automático. Não responda esta mensagem.
+                        </p>
+
+                        <p style="
+                            margin:0;
+                            color:#484f58;
+                            font-size:11px;
+                        ">
+                            © 2026 My Finance — Gestor Financeiro Pessoal
+                        </p>
+
+                        </td>
+                    </tr>
+
+                    </table>
+
+                </td>
+                </tr>
+
+            </table>
 
             </body>
-        </html>
+            </html>
         """
 
         send_email(
