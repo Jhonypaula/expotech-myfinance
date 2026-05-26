@@ -1,4 +1,4 @@
-from core.connection import conectar_banco
+from backend.core.connection import conectar_banco
 
 def buscar_usuario_por_email(email_usuario):
     

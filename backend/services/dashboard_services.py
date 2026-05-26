@@ -1,4 +1,4 @@
-from repository.dashboard_repository import (
+from back_end.repository.dashboard_repository import (
     buscar_saldo_total_repository,
     buscar_total_entradas_repository,
     buscar_total_saidas_repository,

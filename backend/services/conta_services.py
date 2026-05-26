@@ -1,4 +1,4 @@
-from repository.conta_repository import (
+from back_end.repository.conta_repository import (
     criar_conta_repository,
     buscar_conta_por_nome,
     listar_contas_repository,
@@ -7,11 +7,11 @@ from repository.conta_repository import (
     excluir_conta_repository
 )
 
-from repository.transacao_repository import(
+from back_end.repository.transacao_repository import(
     listar_transacoes_fk
 )
 
-from utils.validators import validar_campo_vazio
+from back_end.utils.validators import validar_campo_vazio
 
 def cadastrar_conta_service(
     usuario_id,

@@ -1,13 +1,13 @@
-from utils.validators import (
+from back_end.utils.validators import (
     validar_campo_vazio,
 )
 
-from utils.regex_validators import (
+from back_end.utils.regex_validators import (
     validar_email,
     validar_senha
 )
 
-from repository.auth_repository import (
+from back_end.repository.auth_repository import (
     buscar_usuario_por_email, 
     criar_usuario, 
     buscar_usuario_cadastrado,
@@ -16,7 +16,7 @@ from repository.auth_repository import (
     verificar_status_conta
 )
 
-from utils.security import hash_senha
+from back_end.utils.security import hash_senha
 
 def cadastrar_usuario_service(
     nome_usuario,

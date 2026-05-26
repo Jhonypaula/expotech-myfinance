@@ -1,4 +1,4 @@
-from core.connection import conectar_banco
+from backend.core.connection import conectar_banco
 
 def criar_transacao_repository(
     conta_id,

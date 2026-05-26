@@ -1,20 +1,20 @@
 import os
 
-from services.auth_services import (
+from backend.services.auth_services import (
     cadastrar_usuario_service,
     login_usuario_service,
     buscar_usuario_por_email,
     desativar_usuario_service
 )
 
-from services.conta_services import (
+from backend.services.conta_services import (
     cadastrar_conta_service,
     listar_contas_service,
     editar_conta_service,
     excluir_conta_service
 )
 
-from services.transacao_services import (
+from backend.services.transacao_services import (
     criar_transacao_service,
     listar_transacao_service,
     excluir_transacao_service,
@@ -24,11 +24,11 @@ from services.transacao_services import (
     filtrar_transacoes_descricao_service
 )
 
-from services.categoria_services import (
+from backend.services.categoria_services import (
     listar_categorias_service
 )
 
-from services.dashboard_services import (
+from backend.services.dashboard_services import (
     buscar_saldo_total_service,
     buscar_total_entradas_service,
     buscar_total_saidas_service,
@@ -37,13 +37,13 @@ from services.dashboard_services import (
     buscar_quantidade_transacoes_service
 )
 
-from services.resetar_senha_service import(
+from backend.services.resetar_senha_service import(
     requisicao_alterar_senha,
     resetar_senha,
     validar_token_reset
 )
 
-from utils.regex_validators import (
+from backend.utils.regex_validators import (
     validar_senha
 )
 

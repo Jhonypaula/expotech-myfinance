@@ -1,4 +1,4 @@
-from repository.transacao_repository import (
+from back_end.repository.transacao_repository import (
     criar_transacao_repository,
     listar_transacoes_repository,
     buscar_transacao_por_id,
@@ -8,16 +8,16 @@ from repository.transacao_repository import (
     filtrar_transacoes_categoria_repository,
     filtrar_transacoes_descricao_repository
 )
-from repository.conta_repository import (
+from back_end.repository.conta_repository import (
     buscar_conta_por_id,
     buscar_saldo_conta_repository,
     atualizar_saldo_repository
 )
 
-from utils.validators import (
+from back_end.utils.validators import (
     validar_campo_vazio
 )
-from services.categoria_services import (
+from back_end.services.categoria_services import (
     validar_categoria_service
 )
 
