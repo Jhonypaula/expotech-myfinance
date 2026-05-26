@@ -1,4 +1,4 @@
-from backend.core.connection import conectar_banco
+from core.connection import conectar_banco
 
 def criar_transacao_repository(
     conta_id,
@@ -300,6 +300,47 @@ def filtrar_transacoes_descricao_repository(
 
     cursor.execute(sql, valores)
 
+    transacoes = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
+
+    return transacoes
+
+def listar_todas_transacoes_repository(usuario_id):
+    """Lista todas as transacoes de todas as contas de um usuario.
+
+    Necessario para o frontend desktop que mostra transacoes cruzadas
+    em Dashboard, pagina de Transacoes e Historico.
+    """
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+
+    sql = """
+        SELECT
+            t.id_transacoes,
+            t.conta_id,
+            t.categoria_id,
+            t.tipo_transacoes,
+            t.valor_transacoes,
+            t.descricao_transacoes,
+            t.data_transacao
+        FROM tbl_transacoes t
+
+        INNER JOIN tbl_contas co
+        ON t.conta_id = co.id_contas
+
+        LEFT JOIN tbl_categorias cat
+        ON t.categoria_id = cat.id_categorias
+
+        WHERE co.usuario_id = %s
+
+        ORDER BY t.data_transacao DESC
+    """
+
+    valores = (usuario_id,)
+
+    cursor.execute(sql, valores)
     transacoes = cursor.fetchall()
 
     cursor.close()

@@ -1,4 +1,4 @@
-from back_end.repository.transacao_repository import (
+from repository.transacao_repository import (
     criar_transacao_repository,
     listar_transacoes_repository,
     buscar_transacao_por_id,
@@ -6,18 +6,19 @@ from back_end.repository.transacao_repository import (
     editar_transacao_repository,
     filtrar_transacoes_tipo_repository,
     filtrar_transacoes_categoria_repository,
-    filtrar_transacoes_descricao_repository
+    filtrar_transacoes_descricao_repository,
+    listar_todas_transacoes_repository
 )
-from back_end.repository.conta_repository import (
+from repository.conta_repository import (
     buscar_conta_por_id,
     buscar_saldo_conta_repository,
     atualizar_saldo_repository
 )
 
-from back_end.utils.validators import (
+from utils.validators import (
     validar_campo_vazio
 )
-from back_end.services.categoria_services import (
+from services.categoria_services import (
     validar_categoria_service
 )
 
@@ -478,3 +479,10 @@ def filtrar_transacoes_descricao_service(
     except Exception as e:
         
         print(f"Erro interno: {e}")
+
+def listar_todas_transacoes_service(usuario_id):
+    try:
+        return listar_todas_transacoes_repository(usuario_id)
+    except Exception as e:
+        print(f"Erro interno: {e}")
+        return None

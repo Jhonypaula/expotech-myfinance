@@ -1,4 +1,4 @@
-from backend.core.connection import conectar_banco
+from core.connection import conectar_banco
 
 def buscar_saldo_total_repository(
     usuario_id
@@ -181,3 +181,58 @@ def buscar_quantidade_transacoes_repository(
     conexao.close()
 
     return quantidade_transacoes
+
+def buscar_evolucao_mensal_repository(
+    usuario_id,
+    n_meses
+):
+    """Soma entradas e saidas por ano/mes nos ultimos ``n_meses`` meses.
+
+    Retorna tuplas ``(ano, mes, total_entradas, total_saidas)`` ja em ordem
+    cronologica. Meses sem nenhuma transacao nao aparecem - quem consumir
+    precisa preencher os buracos.
+    """
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+
+    sql = """
+        SELECT
+            YEAR(t.data_transacao) AS ano,
+            MONTH(t.data_transacao) AS mes,
+            SUM(
+                CASE
+                    WHEN t.tipo_transacoes = 'entrada'
+                    THEN t.valor_transacoes
+                    ELSE 0
+                END
+            ) AS total_entradas,
+            SUM(
+                CASE
+                    WHEN t.tipo_transacoes = 'saida'
+                    THEN t.valor_transacoes
+                    ELSE 0
+                END
+            ) AS total_saidas
+
+        FROM tbl_transacoes t
+
+        INNER JOIN tbl_contas co
+        ON t.conta_id = co.id_contas
+
+        WHERE co.usuario_id = %s
+        AND t.data_transacao >= DATE_SUB(CURDATE(), INTERVAL %s MONTH)
+
+        GROUP BY YEAR(t.data_transacao), MONTH(t.data_transacao)
+        ORDER BY ano ASC, mes ASC
+    """
+
+    valores = (usuario_id, n_meses)
+
+    cursor.execute(sql, valores)
+
+    evolucao = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
+
+    return evolucao

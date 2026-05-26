@@ -1,34 +1,34 @@
 from datetime import datetime, timedelta
 
-from back_end.repository.auth_repository import (
+from repository.auth_repository import (
     buscar_usuario_por_email,
     atualizar_senha_usuario
 )
 
-from back_end.repository.resetar_senha_repository import (
+from repository.resetar_senha_repository import (
     salvar_reset_token,
     buscar_token,
     atualizar_token_como_usado,
     invalidar_tokens_anteriores
 )
 
-from back_end.utils.token_generator import (
+from utils.token_generator import (
     generate_reset_token
 )
 
-from back_end.utils.security import (
+from utils.security import (
     hash_senha
 )
 
-from back_end.services.email_service import (
+from services.email_service import (
     send_email
 )
 
-from back_end.utils.regex_validators import (
+from utils.regex_validators import (
     validar_senha
 )
 
-from back_end.utils.validators import (
+from utils.validators import (
     validar_campo_vazio
 )
 

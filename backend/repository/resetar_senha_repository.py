@@ -1,4 +1,4 @@
-from backend.core.connection import conectar_banco
+from core.connection import conectar_banco
 
 
 def salvar_reset_token(

@@ -1,4 +1,4 @@
-from backend.core.connection import conectar_banco
+from core.connection import conectar_banco
 
 def criar_conta_repository(
     usuario_id,
@@ -68,7 +68,7 @@ def listar_contas_repository(usuario_id):
     cursor = conexao.cursor()
     
     sql = """
-        SELECT id_contas, nome_contas, tipo_contas, saldo_contas
+        SELECT id_contas, nome_contas, tipo_contas, saldo_contas, data_criacao_contas
         FROM tbl_contas
         WHERE usuario_id = %s
     """

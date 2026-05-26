@@ -1,4 +1,4 @@
-from back_end.repository.categoria_repository import (
+from repository.categoria_repository import (
     listar_categorias_repository,
     buscar_categoria_por_id
 )

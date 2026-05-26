@@ -1,9 +1,10 @@
-from back_end.repository.dashboard_repository import (
+from repository.dashboard_repository import (
     buscar_saldo_total_repository,
     buscar_total_entradas_repository,
     buscar_total_saidas_repository,
     buscar_gastos_categoria_repository,
     buscar_maior_categoria_repository,
+    buscar_evolucao_mensal_repository,
     buscar_quantidade_transacoes_repository
 )
 
@@ -109,3 +110,19 @@ def buscar_quantidade_transacoes_service(usuario_id):
     
     except Exception as e:
         print(f"Erro interno: {e}")
+
+def buscar_evolucao_mensal_service(usuario_id, n_meses=12):
+    """Devolve a serie mensal de entradas/saidas para o dashboard.
+
+    ``n_meses`` define a janela; o repositorio retorna apenas os meses
+    com transacoes - a camada que consome precisa preencher os buracos.
+    """
+    try:
+        return buscar_evolucao_mensal_repository(
+            usuario_id,
+            n_meses
+        ) or []
+
+    except Exception as e:
+        print(f"Erro interno: {e}")
+        return None
