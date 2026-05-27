@@ -61,6 +61,7 @@ class TxModal(BaseModal):
         categories: list[Category],
         ao_salvar: Callable[[Transaction], None],
         tx: Optional[Transaction] = None,
+        ao_erro: Optional[Callable[[str], None]] = None,
     ) -> None:
         is_edit = tx is not None
         super().__init__(
@@ -71,6 +72,7 @@ class TxModal(BaseModal):
         self._accounts   = accounts
         self._categories = categories
         self._ao_salvar    = ao_salvar
+        self._ao_erro    = ao_erro or (lambda _msg: None)
         self._tx         = tx
         self._montar_formulario(tx)
 
@@ -187,18 +189,31 @@ class TxModal(BaseModal):
                                      activeforeground=C.INK_2)
 
     def _salvar(self) -> None:
+        raw_amount = self._amount_var.get().strip()
+        if not raw_amount:
+            self._ao_erro('O valor deve ser um número válido')
+            return
         try:
-            amount = float(self._amount_var.get().replace(',', '.'))
+            amount = float(raw_amount.replace(',', '.'))
         except ValueError:
+            self._ao_erro('O valor deve ser um número válido')
+            return
+        if amount <= 0:
+            self._ao_erro('O valor deve ser um número positivo')
             return
 
         desc = self._desc_var.get().strip()
         if not desc:
+            self._ao_erro('Descricao obrigatoria!')
+            return
+        if len(desc) > 15:
+            self._ao_erro('Descricao muito longa! Maximo 15')
             return
 
         # Resolve a conta escolhida no combobox.
         acct_idx = self._acct_cb.current()
         if acct_idx < 0 or acct_idx >= len(self._accounts):
+            self._ao_erro('Selecione uma conta para a transacao')
             return
         conta_id = self._accounts[acct_idx].id_contas
 

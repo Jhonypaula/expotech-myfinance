@@ -133,11 +133,13 @@ class TransacoesPage(BasePage):
             self._flash('warning', 'Crie uma conta primeiro antes de adicionar transações.')
             return
         TxModal(self, self._store.accounts, self._store.categories,
-                ao_salvar=self._salvar_transacao)
+                ao_salvar=self._salvar_transacao,
+                ao_erro=lambda msg: self._flash('error', msg))
 
     def _abrir_modal_edicao(self, tx) -> None:
         TxModal(self, self._store.accounts, self._store.categories,
-                ao_salvar=self._salvar_transacao, tx=tx)
+                ao_salvar=self._salvar_transacao, tx=tx,
+                ao_erro=lambda msg: self._flash('error', msg))
 
     def _salvar_transacao(self, draft) -> None:
         """Recebe o rascunho do modal e decide entre criar ou editar."""
