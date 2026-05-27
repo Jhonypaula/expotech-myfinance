@@ -97,7 +97,7 @@ class TxModal(BaseModal):
         super().__init__(
             parent,
             'Editar Transação' if is_edit else 'Nova Transação',
-            width=500, height=460,
+            width=500, height=520,
         )
         self._accounts   = accounts
         self._categories = categories
@@ -286,7 +286,7 @@ class ContaModal(BaseModal):
         super().__init__(
             parent,
             'Editar Conta' if is_edit else 'Nova Conta',
-            width=460, height=320,
+            width=460, height=380,
         )
         self._conta = conta
         self._ao_salvar = ao_salvar
