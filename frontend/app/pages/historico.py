@@ -18,8 +18,33 @@ class HistoricoPage(BasePage):
         self._page     = 1
         self._from_var = tk.StringVar()
         self._to_var   = tk.StringVar()
+        # Aplica máscara dd/mm/aaaa enquanto o usuário digita os números.
+        self._from_var.trace_add('write', lambda *a: self._aplicar_mascara_data(self._from_var))
+        self._to_var.trace_add('write',   lambda *a: self._aplicar_mascara_data(self._to_var))
         self._montar()
         store.inscrever(self._atualizar)
+
+    def _aplicar_mascara_data(self, var: tk.StringVar) -> None:
+        """Mantém o conteúdo de ``var`` no formato dd/mm/aaaa enquanto digita.
+
+        Aceita só dígitos (até 8) e insere as barras nas posições corretas.
+        Letras e caracteres inválidos são descartados.
+        """
+        raw = var.get()
+        digits = ''.join(c for c in raw if c.isdigit())[:8]
+
+        partes: list[str] = []
+        if digits[:2]:
+            partes.append(digits[:2])
+        if digits[2:4]:
+            partes.append(digits[2:4])
+        if digits[4:8]:
+            partes.append(digits[4:8])
+        formatado = '/'.join(partes)
+
+        # Set só dispara recursão; comparar evita loop infinito.
+        if formatado != raw:
+            var.set(formatado)
 
     def _montar(self) -> None:
         pad = C.CONTENT_PAD
