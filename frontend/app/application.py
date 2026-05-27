@@ -111,7 +111,7 @@ class Application:
         # A topbar mostra dados do usuário, então nasce só depois do login.
         if self._topbar is not None:
             self._topbar.destroy()
-        self._topbar = Topbar(self._main_col, user=self._store.user)
+        self._topbar = Topbar(self._main_col, user=self._store.user, ao_sair=self._sair)
         self._topbar.grid(row=0, column=0, sticky='ew')
 
         # Garante que um novo login não herde widgets da sessão anterior.
@@ -202,6 +202,5 @@ class Application:
             active_screen=active,
             ao_navegar=self._exibir_tela,
             user=self._store.user,
-            ao_sair=self._sair,
         )
         self._sidebar.grid(row=0, column=0, sticky='ns')

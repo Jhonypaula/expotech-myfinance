@@ -29,13 +29,11 @@ class Sidebar(tk.Frame):
         active_screen: str,
         ao_navegar: Callable[[str], None],
         user: User,
-        ao_sair: Callable[[], None],
         **kwargs,
     ) -> None:
         super().__init__(parent, bg=C.SIDE, width=C.SIDEBAR_W, **kwargs)
         self.pack_propagate(False)
         self._ao_navegar = ao_navegar
-        self._ao_sair = ao_sair
         self._active = active_screen
         self._btns: dict[str, tk.Button] = {}
         self._montar(user)
@@ -92,17 +90,8 @@ class Sidebar(tk.Frame):
         tk.Label(av, text=user.nome_usuarios[0], bg=C.GREEN, fg='white',
                  font=(C.FONT_BODY, 11, 'bold')).pack(expand=True)
 
-        # Sair da sessão atual. Precisa ser empacotado antes do `col` para
-        # reservar o canto direito; senão `expand=True` engole toda a largura.
-        lb = tk.Button(user_row, text='⇥  Sair', bg=C.SIDE_2, fg=C.SIDE_TEXT,
-                       bd=0, cursor='hand2', font=(C.FONT_BODY, 10, 'bold'),
-                       activebackground=C.SIDE_3, activeforeground='#ff8775',
-                       command=self._ao_sair, padx=8, pady=4)
-        lb.pack(side='right')
-        lb.bind('<Enter>', lambda e: lb.config(bg=C.SIDE_3, fg='#ff8775'))
-        lb.bind('<Leave>', lambda e: lb.config(bg=C.SIDE_2, fg=C.SIDE_TEXT))
-
-        # Identificação da sessão (entra entre o avatar e o botão de sair).
+        # Identificação da sessão. O botão de sair agora vive na topbar,
+        # então o nome e o e-mail ocupam o resto da largura disponível.
         col = tk.Frame(user_row, bg=C.SIDE_2)
         col.pack(side='left', padx=(8, 0), fill='x', expand=True)
         tk.Label(col, text=user.nome_usuarios, bg=C.SIDE_2, fg='#e6ecf4',
