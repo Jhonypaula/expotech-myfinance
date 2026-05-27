@@ -1,6 +1,7 @@
 """Janelas modais usadas no fluxo de contas e transações."""
 from __future__ import annotations
 import tkinter as tk
+from tkinter import messagebox, ttk
 from typing import Callable, Optional
 from datetime import datetime
 from app import config as C
@@ -8,7 +9,7 @@ from app.components.widgets import entry, button, field_label, combobox
 from app.models.transaction import Transaction
 from app.models.account import Account
 from app.models.category import Category
-from app.utils import formatar_brl
+from app.utils import formatar_brl, aplicar_mascara_data
 
 
 _CONTA_TIPOS = ['corrente', 'poupanca', 'carteira']
@@ -81,6 +82,129 @@ class BaseModal(tk.Toplevel):
         return filhos[0] if filhos else self.body_frame
 
 
+class DatePickerPopup(tk.Toplevel):
+    """Calendário pop-up minimalista compatível com Tkinter puro.
+
+    Após a seleção, preenche *target_var* com a data no formato dd/mm/aaaa.
+    """
+
+    _DIAS_SEMANA = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']
+    _MESES = [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+    ]
+
+    def __init__(self, parent: tk.Widget, target_var: tk.StringVar,
+                 initial: 'datetime | None' = None) -> None:
+        super().__init__(parent)
+        self.overrideredirect(True)
+        self.configure(bg=C.SURFACE)
+        self.attributes('-topmost', True)
+        self.resizable(False, False)
+        self._target = target_var
+        now = initial or datetime.now()
+        self._year  = tk.IntVar(value=now.year)
+        self._month = tk.IntVar(value=now.month)
+
+        outer = tk.Frame(self, bg=C.HAIRLINE, padx=1, pady=1)
+        outer.pack()
+        self._inner = tk.Frame(outer, bg=C.SURFACE)
+        self._inner.pack()
+
+        self._montar_cabecalho()
+        self._montar_dias_semana()
+        self._cell_frame = tk.Frame(self._inner, bg=C.SURFACE)
+        self._cell_frame.pack(padx=10, pady=(0, 8))
+        self._montar_celulas()
+
+        self.update_idletasks()
+        px = parent.winfo_rootx()
+        py = parent.winfo_rooty() + parent.winfo_height() + 2
+        self.geometry(f'+{px}+{py}')
+        self.bind('<FocusOut>', lambda _e: self._fechar())
+        self.focus_set()
+
+    def _montar_cabecalho(self) -> None:
+        hdr = tk.Frame(self._inner, bg=C.SURFACE)
+        hdr.pack(fill='x', padx=10, pady=8)
+        tk.Button(hdr, text='‹', bg=C.SURFACE, fg=C.INK_2, bd=0,
+                  cursor='hand2', font=(C.FONT_BODY, 13, 'bold'),
+                  activebackground=C.BG_2,
+                  command=self._mes_anterior).pack(side='left')
+        self._hdr_lbl = tk.Label(hdr, text='', bg=C.SURFACE, fg=C.INK,
+                                  font=(C.FONT_DISPLAY, 11, 'bold'))
+        self._hdr_lbl.pack(side='left', expand=True)
+        self._atualizar_cabecalho()
+        tk.Button(hdr, text='›', bg=C.SURFACE, fg=C.INK_2, bd=0,
+                  cursor='hand2', font=(C.FONT_BODY, 13, 'bold'),
+                  activebackground=C.BG_2,
+                  command=self._proximo_mes).pack(side='right')
+
+    def _montar_dias_semana(self) -> None:
+        row = tk.Frame(self._inner, bg=C.BG_2)
+        row.pack(fill='x', padx=10)
+        for d in self._DIAS_SEMANA:
+            tk.Label(row, text=d, bg=C.BG_2, fg=C.INK_3,
+                     font=(C.FONT_BODY, 8, 'bold'), width=4).pack(side='left')
+
+    def _montar_celulas(self) -> None:
+        for w in self._cell_frame.winfo_children():
+            w.destroy()
+        import calendar
+        year  = self._year.get()
+        month = self._month.get()
+        for week in calendar.monthcalendar(year, month):
+            row = tk.Frame(self._cell_frame, bg=C.SURFACE)
+            row.pack()
+            for day in week:
+                if day == 0:
+                    tk.Label(row, text='', bg=C.SURFACE, width=4,
+                             font=(C.FONT_BODY, 9)).pack(side='left')
+                else:
+                    d = day
+                    btn = tk.Button(
+                        row, text=str(d), width=3,
+                        bg=C.SURFACE, fg=C.INK, bd=0,
+                        font=(C.FONT_BODY, 9), relief='flat', cursor='hand2',
+                        activebackground=C.GREEN_50, activeforeground=C.GREEN_700,
+                        command=lambda dy=d: self._selecionar_dia(dy),
+                    )
+                    btn.pack(side='left', padx=1, pady=1)
+                    btn.bind('<Enter>', lambda e, b=btn: b.config(bg=C.GREEN_50, fg=C.GREEN_700))
+                    btn.bind('<Leave>', lambda e, b=btn: b.config(bg=C.SURFACE, fg=C.INK))
+
+    def _atualizar_cabecalho(self) -> None:
+        self._hdr_lbl.config(
+            text=f'{self._MESES[self._month.get() - 1]}  {self._year.get()}')
+
+    def _mes_anterior(self) -> None:
+        m, y = self._month.get(), self._year.get()
+        if m == 1:
+            self._month.set(12); self._year.set(y - 1)
+        else:
+            self._month.set(m - 1)
+        self._atualizar_cabecalho(); self._montar_celulas()
+
+    def _proximo_mes(self) -> None:
+        m, y = self._month.get(), self._year.get()
+        if m == 12:
+            self._month.set(1); self._year.set(y + 1)
+        else:
+            self._month.set(m + 1)
+        self._atualizar_cabecalho(); self._montar_celulas()
+
+    def _selecionar_dia(self, day: int) -> None:
+        dt = datetime(self._year.get(), self._month.get(), day)
+        self._target.set(dt.strftime('%d/%m/%Y'))
+        self.destroy()
+
+    def _fechar(self) -> None:
+        try:
+            self.destroy()
+        except tk.TclError:
+            pass
+
+
 class TxModal(BaseModal):
     """Formulário de criação/edição de transação."""
 
@@ -97,13 +221,13 @@ class TxModal(BaseModal):
         super().__init__(
             parent,
             'Editar Transação' if is_edit else 'Nova Transação',
-            width=500, height=520,
+            width=500, height=490,
         )
-        self._accounts   = accounts
-        self._categories = categories
-        self._ao_salvar    = ao_salvar
-        self._ao_erro    = ao_erro or (lambda _msg: None)
-        self._tx         = tx
+        self._accounts    = accounts
+        self._categories  = categories
+        self._ao_salvar   = ao_salvar
+        self._ao_erro     = ao_erro or (lambda _msg: None)
+        self._tx          = tx
         self._montar_formulario(tx)
 
     def _montar_formulario(self, tx: Optional[Transaction]) -> None:
@@ -111,9 +235,7 @@ class TxModal(BaseModal):
         bf = self.body_frame
 
         # Tipo da movimentação.
-        self._type_var = tk.StringVar(
-            value=tx.tipo_transacoes if tx else 'saida')
-
+        self._type_var = tk.StringVar(value=tx.tipo_transacoes if tx else 'saida')
         toggle = tk.Frame(bf, bg=bg)
         toggle.pack(fill='x', pady=(0, 14))
         self._btn_entrada = self._botao_tipo(toggle, 'entrada', 'Entrada ↓')
@@ -129,8 +251,7 @@ class TxModal(BaseModal):
         amount_row.pack(fill='x', pady=(0, 10))
         tk.Label(amount_row, text='R$', bg=C.BG_2, fg=C.INK_3,
                  font=(C.FONT_BODY, 11), padx=10, pady=7).pack(side='left')
-        self._amount_var = tk.StringVar(
-            value=str(tx.valor_transacoes) if tx else '')
+        self._amount_var = tk.StringVar(value=str(tx.valor_transacoes) if tx else '')
         tk.Entry(amount_row, textvariable=self._amount_var,
                  bg=C.SURFACE, fg=C.INK, insertbackground=C.INK,
                  relief='flat', bd=4, font=(C.FONT_MONO, 12)).pack(
@@ -138,30 +259,21 @@ class TxModal(BaseModal):
 
         # Descrição
         field_label(bf, 'Descrição *', bg)
-        self._desc_var = tk.StringVar(
-            value=tx.descricao_transacoes if tx else '')
+        self._desc_var = tk.StringVar(value=tx.descricao_transacoes if tx else '')
         entry(bf, textvariable=self._desc_var).pack(fill='x', pady=(0, 10), ipady=5)
 
-        # O backend ainda ignora esta data ao criar transação, mas ela segue útil na edição.
-        field_label(bf, 'Data e hora (data_transacao)', bg)
-        self._date_var = tk.StringVar(
-            value=tx.data_transacao if tx else datetime.now().strftime('%Y-%m-%dT%H:%M'))
-        entry(bf, textvariable=self._date_var).pack(fill='x', pady=(0, 10), ipady=5)
-
-        # Conta e categoria ficam juntas para encurtar o modal.
+        # Conta e categoria lado a lado.
         two = tk.Frame(bf, bg=bg)
         two.pack(fill='x', pady=(0, 4))
         two.columnconfigure(0, weight=1)
         two.columnconfigure(1, weight=1)
 
-        # Conta gravada em conta_id.
         acct_col = tk.Frame(two, bg=bg)
         acct_col.grid(row=0, column=0, sticky='ew', padx=(0, 6))
-        field_label(acct_col, 'Conta * (conta_id)', bg)
+        field_label(acct_col, 'Conta *', bg)
         acct_labels = [f'{a.nome_contas} — {formatar_brl(a.saldo_contas)}' for a in self._accounts]
         self._acct_var = tk.StringVar()
-        self._acct_cb  = combobox(acct_col, values=acct_labels,
-                                  textvariable=self._acct_var)
+        self._acct_cb  = combobox(acct_col, values=acct_labels, textvariable=self._acct_var)
         self._acct_cb.pack(fill='x', ipady=3)
         if tx:
             idx = next((i for i, a in enumerate(self._accounts)
@@ -170,29 +282,25 @@ class TxModal(BaseModal):
         elif self._accounts:
             self._acct_cb.current(0)
 
-        # Categoria gravada em categoria_id.
         cat_col = tk.Frame(two, bg=bg)
         cat_col.grid(row=0, column=1, sticky='ew', padx=(6, 0))
-        field_label(cat_col, 'Categoria (categoria_id)', bg)
+        field_label(cat_col, 'Categoria', bg)
         cat_labels = ['— Nenhuma —'] + [c.nome_categorias for c in self._categories]
         self._cat_var = tk.StringVar()
-        self._cat_cb  = combobox(cat_col, values=cat_labels,
-                                 textvariable=self._cat_var)
+        self._cat_cb  = combobox(cat_col, values=cat_labels, textvariable=self._cat_var)
         self._cat_cb.pack(fill='x', ipady=3)
         if tx and tx.categoria_id is not None:
             idx = next((i for i, c in enumerate(self._categories)
                         if c.id_categorias == tx.categoria_id), -1)
-            self._cat_cb.current(idx + 1)   # índice 0 fica reservado para "Nenhuma"
+            self._cat_cb.current(idx + 1)
         else:
             self._cat_cb.current(0)
 
-        # Ações
         button(self.footer_frame, 'Cancelar', command=self.destroy,
                variant='ghost').pack(side='right', padx=(6, 16), pady=10)
         button(self.footer_frame, 'Salvar', command=self._salvar,
                variant='primary').pack(side='right', pady=10)
 
-    # Auxiliares
     def _botao_tipo(self, parent: tk.Widget, kind: str, text: str) -> tk.Button:
         return tk.Button(parent, text=text, font=(C.FONT_BODY, 11),
                          bd=0, cursor='hand2', relief='flat', pady=8,
@@ -241,24 +349,23 @@ class TxModal(BaseModal):
             self._sinalizar_erro('Descricao obrigatoria!')
             return
         if len(desc) > 15:
-            self._sinalizar_erro('Descricao muito longa! Maximo 15')
+            self._sinalizar_erro('Descricao muito longa! Maximo 15 caracteres')
             return
 
-        # Resolve a conta escolhida no combobox.
+        # Data preenchida automaticamente pelo banco no INSERT; na edição preserva o valor original.
+        data_iso = self._tx.data_transacao if self._tx else ''
+
         acct_idx = self._acct_cb.current()
         if acct_idx < 0 or acct_idx >= len(self._accounts):
             self._sinalizar_erro('Selecione uma conta para a transacao')
             return
         conta_id = self._accounts[acct_idx].id_contas
 
-        # No combobox, 0 é "sem categoria"; as categorias reais começam em 1.
         cat_idx = self._cat_cb.current()
         categoria_id: Optional[int] = None
         if cat_idx > 0:
             categoria_id = self._categories[cat_idx - 1].id_categorias
 
-        # id zero é nosso rascunho local; o banco gera o id definitivo.
-        # Ao criar, data_transacao volta do backend com CURRENT_TIMESTAMP.
         draft = Transaction(
             id_transacoes        = self._tx.id_transacoes if self._tx else 0,
             conta_id             = conta_id,
@@ -266,11 +373,10 @@ class TxModal(BaseModal):
             tipo_transacoes      = self._type_var.get(),
             valor_transacoes     = amount,
             descricao_transacoes = desc,
-            data_transacao       = self._date_var.get(),
+            data_transacao       = data_iso,
         )
         self._ao_salvar(draft)
         self.destroy()
-
 
 class ContaModal(BaseModal):
     """Formulário de edição de conta (apenas nome e tipo são editáveis)."""
