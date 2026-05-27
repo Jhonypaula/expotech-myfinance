@@ -179,7 +179,14 @@ class CadastroPage(tk.Frame):
             self._exibir_erro('Informe o e-mail')
             return
         if senha != senha2:
-            self._exibir_erro('As senhas nao coincidem')
+            # Se o usuário não digitou a confirmação, mostra mensagem específica.
+            # Caso contrário, o `_mismatch_lbl` já está visível via _verificar_match;
+            # não duplicamos a mensagem no _err_lbl.
+            if not senha2:
+                self._exibir_erro('Confirme sua senha')
+            else:
+                self._err_lbl.pack_forget()
+                self._verificar_match()
             return
 
         user, msg = backend.cadastrar(nome, email, senha)
