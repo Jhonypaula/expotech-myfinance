@@ -65,6 +65,12 @@ class HistoricoPage(BasePage):
         button(btn_col, '✕ Limpar', command=self._limpar_filtro,
                variant='ghost', size='sm').pack(fill='x')
 
+        # Faixa de erro inline para datas invalidas.
+        self._err_var = tk.StringVar(value='')
+        self._err_lbl = tk.Label(hdr_inner, textvariable=self._err_var, bg=C.RED_50,
+                                 fg=C.RED, font=(C.FONT_BODY, 10), padx=8, pady=4,
+                                 wraplength=600, justify='left', anchor='w')
+
         # Tabela de transações.
         tx_outer = tk.Frame(self, bg=C.BG)
         tx_outer.pack(fill='both', expand=True, padx=pad, pady=(12, 0))
@@ -86,31 +92,57 @@ class HistoricoPage(BasePage):
 
         self._atualizar()
 
-    def _parsear_data(self, value: str) -> datetime | None:
-        """Aceita dd/mm/aaaa; campo vazio ou inválido fica sem filtro."""
+    def _parsear_data(self, value: str) -> tuple[datetime | None, bool]:
+        """Devolve (data, valida). Campo vazio é (None, True); lixo é (None, False)."""
         v = value.strip()
         if not v:
-            return None
+            return None, True
         try:
-            return datetime.strptime(v, '%d/%m/%Y')
+            return datetime.strptime(v, '%d/%m/%Y'), True
         except ValueError:
-            return None
+            return None, False
 
     def _aplicar_filtro(self) -> None:
+        from_dt, from_ok = self._parsear_data(self._from_var.get())
+        to_dt,   to_ok   = self._parsear_data(self._to_var.get())
+
+        invalidos = []
+        if not from_ok:
+            invalidos.append('"De"')
+        if not to_ok:
+            invalidos.append('"Até"')
+        if invalidos:
+            campos = ' e '.join(invalidos)
+            self._exibir_erro(f'Data invalida no campo {campos}. Use dd/mm/aaaa.')
+            return
+
+        if from_dt and to_dt and from_dt > to_dt:
+            self._exibir_erro('A data inicial deve ser anterior ou igual a data final.')
+            return
+
+        self._err_lbl.pack_forget()
         self._page = 1
         self._atualizar()
 
     def _limpar_filtro(self) -> None:
         self._from_var.set('')
         self._to_var.set('')
+        self._err_lbl.pack_forget()
         self._page = 1
         self._atualizar()
 
+    def _exibir_erro(self, msg: str) -> None:
+        self._err_var.set(f'!  {msg}')
+        self._err_lbl.pack(fill='x', pady=(10, 0))
+
     def _obter_filtradas(self) -> list:
-        txs     = sorted(self._store.transactions,
-                         key=lambda t: t.data_transacao, reverse=True)
-        from_dt = self._parsear_data(self._from_var.get())
-        to_dt   = self._parsear_data(self._to_var.get())
+        txs = sorted(self._store.transactions,
+                     key=lambda t: t.data_transacao, reverse=True)
+        # Aqui as datas ja passaram pelo `_aplicar_filtro`; o que nao parsear
+        # eh tratado como ausencia de filtro para nao quebrar o `_atualizar`
+        # disparado por outras fontes (inscricao no store, troca de pagina).
+        from_dt, _ = self._parsear_data(self._from_var.get())
+        to_dt,   _ = self._parsear_data(self._to_var.get())
 
         if not from_dt and not to_dt:
             return txs
@@ -139,14 +171,14 @@ class HistoricoPage(BasePage):
         end      = min(start + _PER_PAGE, total)
         page_txs = txs[start:end]
 
-        # Texto do cabeçalho muda quando há filtro ativo.
-        from_str = self._from_var.get().strip()
-        to_str   = self._to_var.get().strip()
+        # O cabecalho so mostra o periodo quando as duas datas (ou uma) sao validas.
+        from_dt, from_ok = self._parsear_data(self._from_var.get())
+        to_dt,   to_ok   = self._parsear_data(self._to_var.get())
         filter_note = ''
-        if from_str or to_str:
+        if from_ok and to_ok and (from_dt or to_dt):
             parts = []
-            if from_str: parts.append(f'de {from_str}')
-            if to_str:   parts.append(f'até {to_str}')
+            if from_dt: parts.append(f'de {from_dt.strftime("%d/%m/%Y")}')
+            if to_dt:   parts.append(f'até {to_dt.strftime("%d/%m/%Y")}')
             filter_note = f' · Período: {" ".join(parts)}'
 
         self._info_lbl.config(
