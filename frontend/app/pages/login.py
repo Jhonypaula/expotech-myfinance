@@ -102,15 +102,21 @@ class LoginPage(tk.Frame):
         tk.Label(form_wrap, text='Senha', bg=C.SURFACE, fg=C.INK_3,
                  font=(C.FONT_BODY, 10, 'bold')).pack(anchor='w', pady=(0, 4))
         self._pw_var = tk.StringVar()
-        pw_row = tk.Frame(form_wrap, bg=C.SURFACE)
+        pw_row = tk.Frame(form_wrap, bg=C.SURFACE,
+                          highlightthickness=1, highlightbackground=C.HAIRLINE)
         pw_row.pack(fill='x', pady=(0, 6))
-        self._pw_entry = entry(pw_row, textvariable=self._pw_var, show='*')
+        self._pw_entry = entry(pw_row, textvariable=self._pw_var, show='*',
+                               highlightthickness=0)
         self._pw_entry.pack(side='left', fill='x', expand=True, ipady=6)
         self._show_pw = False
-        show_btn = tk.Button(pw_row, text='*', bg=C.BG_2, fg=C.INK_3, bd=0,
-                             cursor='hand2', font=(C.FONT_BODY, 11), padx=8,
-                             command=self._alternar_senha)
-        show_btn.pack(side='right', fill='y')
+        # Ícone Unicode de olho aberto/fechado — disponível em todas as plataformas.
+        self._eye_btn = tk.Button(
+            pw_row, text='👁', bg=C.SURFACE, fg=C.INK_3, bd=0,
+            cursor='hand2', font=(C.FONT_BODY, 11), padx=10, pady=0,
+            relief='flat', activebackground=C.BG_2,
+            command=self._alternar_senha,
+        )
+        self._eye_btn.pack(side='right', fill='y', padx=(0, 2))
 
         # Link que abre o fluxo de recuperação de senha.
         forgot_lbl = tk.Label(form_wrap, text='Esqueci minha senha', bg=C.SURFACE, fg=C.BLUE,
@@ -140,6 +146,8 @@ class LoginPage(tk.Frame):
     def _alternar_senha(self) -> None:
         self._show_pw = not self._show_pw
         self._pw_entry.configure(show='' if self._show_pw else '*')
+        # Alterna entre olho aberto e olho riscado para feedback visual claro.
+        self._eye_btn.configure(text='🙈' if self._show_pw else '👁')
 
     def _enviar(self) -> None:
         from app.services import backend
