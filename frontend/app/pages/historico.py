@@ -7,6 +7,7 @@ from app.pages.base import BasePage
 from app.state.store import AppStore
 from app.components.tx_table import TxTable
 from app.components.widgets import card, button, entry
+from app.utils import aplicar_mascara_data, parsear_data
 
 _PER_PAGE = 20
 
@@ -19,32 +20,10 @@ class HistoricoPage(BasePage):
         self._from_var = tk.StringVar()
         self._to_var   = tk.StringVar()
         # Aplica máscara dd/mm/aaaa enquanto o usuário digita os números.
-        self._from_var.trace_add('write', lambda *a: self._aplicar_mascara_data(self._from_var))
-        self._to_var.trace_add('write',   lambda *a: self._aplicar_mascara_data(self._to_var))
+        self._from_var.trace_add('write', lambda *_: aplicar_mascara_data(self._from_var))
+        self._to_var.trace_add('write',   lambda *_: aplicar_mascara_data(self._to_var))
         self._montar()
         store.inscrever(self._atualizar)
-
-    def _aplicar_mascara_data(self, var: tk.StringVar) -> None:
-        """Mantém o conteúdo de ``var`` no formato dd/mm/aaaa enquanto digita.
-
-        Aceita só dígitos (até 8) e insere as barras nas posições corretas.
-        Letras e caracteres inválidos são descartados.
-        """
-        raw = var.get()
-        digits = ''.join(c for c in raw if c.isdigit())[:8]
-
-        partes: list[str] = []
-        if digits[:2]:
-            partes.append(digits[:2])
-        if digits[2:4]:
-            partes.append(digits[2:4])
-        if digits[4:8]:
-            partes.append(digits[4:8])
-        formatado = '/'.join(partes)
-
-        # Set só dispara recursão; comparar evita loop infinito.
-        if formatado != raw:
-            var.set(formatado)
 
     def _montar(self) -> None:
         pad = C.CONTENT_PAD
@@ -117,19 +96,9 @@ class HistoricoPage(BasePage):
 
         self._atualizar()
 
-    def _parsear_data(self, value: str) -> tuple[datetime | None, bool]:
-        """Devolve (data, valida). Campo vazio é (None, True); lixo é (None, False)."""
-        v = value.strip()
-        if not v:
-            return None, True
-        try:
-            return datetime.strptime(v, '%d/%m/%Y'), True
-        except ValueError:
-            return None, False
-
     def _aplicar_filtro(self) -> None:
-        from_dt, from_ok = self._parsear_data(self._from_var.get())
-        to_dt,   to_ok   = self._parsear_data(self._to_var.get())
+        from_dt, from_ok = parsear_data(self._from_var.get())
+        to_dt,   to_ok   = parsear_data(self._to_var.get())
 
         invalidos = []
         if not from_ok:
@@ -166,8 +135,8 @@ class HistoricoPage(BasePage):
         # Aqui as datas ja passaram pelo `_aplicar_filtro`; o que nao parsear
         # eh tratado como ausencia de filtro para nao quebrar o `_atualizar`
         # disparado por outras fontes (inscricao no store, troca de pagina).
-        from_dt, _ = self._parsear_data(self._from_var.get())
-        to_dt,   _ = self._parsear_data(self._to_var.get())
+        from_dt, _ = parsear_data(self._from_var.get())
+        to_dt,   _ = parsear_data(self._to_var.get())
 
         if not from_dt and not to_dt:
             return txs
@@ -196,9 +165,9 @@ class HistoricoPage(BasePage):
         end      = min(start + _PER_PAGE, total)
         page_txs = txs[start:end]
 
-        # O cabecalho so mostra o periodo quando as duas datas (ou uma) sao validas.
-        from_dt, from_ok = self._parsear_data(self._from_var.get())
-        to_dt,   to_ok   = self._parsear_data(self._to_var.get())
+        # O cabeçalho so mostra o periodo quando as duas datas (ou uma) sao validas.
+        from_dt, from_ok = parsear_data(self._from_var.get())
+        to_dt,   to_ok   = parsear_data(self._to_var.get())
         filter_note = ''
         if from_ok and to_ok and (from_dt or to_dt):
             parts = []
