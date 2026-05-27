@@ -30,7 +30,7 @@ def _texto_tendencia(curr: float, prev: float, label_prev: str) -> tuple[str, bo
     if prev == 0:
         if curr == 0:
             return f'sem variacao vs. {label_prev}', True
-        return f'novo este mes vs. {label_prev}', curr > 0
+        return f'mes atual vs. {label_prev}', curr > 0
     delta = (curr - prev) / abs(prev) * 100
     sign = '+' if delta >= 0 else '−'
     return f'{sign}{abs(delta):.1f}% vs. {label_prev}', delta >= 0

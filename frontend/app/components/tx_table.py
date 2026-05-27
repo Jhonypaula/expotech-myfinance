@@ -79,7 +79,7 @@ class TxTable(tk.Frame):
 
         if has_actions:
             self._tree.heading('actions', text='Ações')
-            self._tree.column('actions', width=80, anchor='center', stretch=False)
+            self._tree.column('actions', width=90, anchor='center', stretch=False)
 
         self._tree.tag_configure('even', background=C.SURFACE)
         self._tree.tag_configure('odd',  background=C.SURFACE_2)
@@ -90,6 +90,7 @@ class TxTable(tk.Frame):
 
         if has_actions:
             self._tree.bind('<Double-1>', self._ao_clique_duplo)
+            self._tree.bind('<Button-1>', self._ao_clique_simples)
             self._tree.bind('<Delete>',   self._ao_tecla_delete)
 
     def load(
@@ -118,7 +119,7 @@ class TxTable(tk.Frame):
             values = (tx.descricao_transacoes, kind, acct_name, cat_name,
                       formatar_data_curta(tx.data_transacao), signed)
             if self._ao_editar or self._ao_excluir:
-                values = (*values, '✎  🗑')
+                values = (*values, '✎   🗑')
 
             iid = self._tree.insert('', 'end', values=values, tags=(row_tag, val_tag))
             self._tx_map[iid] = tx
@@ -126,6 +127,33 @@ class TxTable(tk.Frame):
     def _transacao_selecionada(self) -> Optional[Transaction]:
         sel = self._tree.selection()
         return self._tx_map.get(sel[0]) if sel else None
+
+    def _ao_clique_simples(self, event: tk.Event) -> None:
+        """Detecta clique na coluna 'actions' e dispara editar ou excluir."""
+        col_id = self._tree.identify_column(event.x)   # '#1', '#2', …, '#7'
+        region = self._tree.identify_region(event.x, event.y)
+        if region != 'cell' or col_id != '#7':
+            return
+
+        iid = self._tree.identify_row(event.y)
+        tx  = self._tx_map.get(iid)
+        if not tx:
+            return
+
+        # Descobre a posição X relativa dentro da célula de ações.
+        # A célula tem 80 px; metade esquerda = ✎ (editar), metade direita = 🗑 (excluir).
+        bbox = self._tree.bbox(iid, col_id)
+        if not bbox:
+            return
+        cell_x = event.x - bbox[0]
+        mid    = bbox[2] // 2          # metade da largura da célula
+
+        if cell_x <= mid:
+            if self._ao_editar:
+                self._ao_editar(tx)
+        else:
+            if self._ao_excluir:
+                self._ao_excluir(tx)
 
     def _ao_clique_duplo(self, _event) -> None:
         tx = self._transacao_selecionada()
