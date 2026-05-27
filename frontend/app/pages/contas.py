@@ -7,6 +7,7 @@ from app.pages.base import BasePage
 from app.state.store import AppStore
 from app.models.account import Account
 from app.components.widgets import card, entry, button, field_label, scrollable_frame
+from app.components.modal import ContaModal
 from app.utils import formatar_brl
 
 _TYPE_ICON  = {'corrente': '🏦', 'poupanca': '🐷', 'carteira': '👛'}
@@ -168,6 +169,14 @@ class ContasPage(BasePage):
         )
         del_btn.pack(side='right', anchor='n')
 
+        edit_btn = tk.Button(
+            top, text='✎', bg=C.SURFACE, fg=C.INK_4,
+            bd=0, cursor='hand2', font=(C.FONT_BODY, 12),
+            activebackground=C.GREEN_50, activeforeground=C.GREEN_700,
+            command=lambda conta=a: self._editar(conta),
+        )
+        edit_btn.pack(side='right', anchor='n', padx=(0, 4))
+
         bal_fg = C.GREEN_700 if a.saldo_contas >= 0 else C.RED
         tk.Label(inner, text=formatar_brl(a.saldo_contas), bg=C.SURFACE, fg=bal_fg,
                  font=(C.FONT_MONO, 17, 'bold')).pack(anchor='w', pady=(12, 4))
@@ -179,6 +188,21 @@ class ContasPage(BasePage):
         tk.Label(info, text=f'Criada em {a.data_criacao_contas}', bg=C.SURFACE,
                  fg=C.INK_4, font=(C.FONT_BODY, 9)).pack(side='right')
         return f
+
+    def _editar(self, conta: Account) -> None:
+        ContaModal(
+            self,
+            conta=conta,
+            ao_salvar=lambda nome, tipo: self._aplicar_edicao(conta.id_contas, nome, tipo),
+            ao_erro=lambda msg: self._flash('error', msg),
+        )
+
+    def _aplicar_edicao(self, id_contas: int, nome: str, tipo: str) -> None:
+        ok, msg = self._store.editar_conta(id_contas, nome, tipo)
+        if ok:
+            self._flash('success', f'Conta "{nome}" atualizada')
+        else:
+            self._flash('error', msg or 'Nao foi possivel atualizar a conta')
 
     def _excluir(self, id_contas: int, name: str) -> None:
         if not messagebox.askyesno('Excluir conta', f'Excluir a conta "{name}"?'):

@@ -193,6 +193,23 @@ class AppStore:
             self._notificar()
         return ok, msg
 
+    def editar_conta(
+        self,
+        id_contas: int,
+        nome: str,
+        tipo: str,
+    ) -> Tuple[bool, str]:
+        ok, msg = backend.editar_conta(
+            self._user.id_usuarios,
+            id_contas,
+            nome,
+            tipo,
+        )
+        if ok:
+            self._recarregar_contas()
+            self._notificar()
+        return ok, msg
+
     # Transações
     def criar_transacao(
         self,

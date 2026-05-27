@@ -1,4 +1,4 @@
-"""Janelas modais usadas no fluxo de transações."""
+"""Janelas modais usadas no fluxo de contas e transações."""
 from __future__ import annotations
 import tkinter as tk
 from typing import Callable, Optional
@@ -9,6 +9,14 @@ from app.models.transaction import Transaction
 from app.models.account import Account
 from app.models.category import Category
 from app.utils import formatar_brl
+
+
+_CONTA_TIPOS = ['corrente', 'poupanca', 'carteira']
+_CONTA_TIPO_LABEL = {
+    'corrente': 'Corrente',
+    'poupanca': 'Poupança',
+    'carteira': 'Carteira',
+}
 
 
 class BaseModal(tk.Toplevel):
@@ -235,4 +243,77 @@ class TxModal(BaseModal):
             data_transacao       = self._date_var.get(),
         )
         self._ao_salvar(draft)
+        self.destroy()
+
+
+class ContaModal(BaseModal):
+    """Formulário de edição de conta (apenas nome e tipo são editáveis)."""
+
+    def __init__(
+        self,
+        parent: tk.Widget,
+        ao_salvar: Callable[[str, str], None],
+        conta: Optional[Account] = None,
+        ao_erro: Optional[Callable[[str], None]] = None,
+    ) -> None:
+        is_edit = conta is not None
+        super().__init__(
+            parent,
+            'Editar Conta' if is_edit else 'Nova Conta',
+            width=460, height=320,
+        )
+        self._conta = conta
+        self._ao_salvar = ao_salvar
+        self._ao_erro = ao_erro or (lambda _msg: None)
+        self._montar_formulario()
+
+    def _montar_formulario(self) -> None:
+        bg = C.SURFACE
+        bf = self.body_frame
+
+        # Nome da conta.
+        field_label(bf, 'Nome da conta *', bg)
+        self._name_var = tk.StringVar(
+            value=self._conta.nome_contas if self._conta else '')
+        entry(bf, textvariable=self._name_var).pack(fill='x', ipady=6, pady=(0, 12))
+
+        # Tipo da conta (ENUM do backend).
+        field_label(bf, 'Tipo da conta *', bg)
+        labels = [_CONTA_TIPO_LABEL[t] for t in _CONTA_TIPOS]
+        self._tipo_var = tk.StringVar()
+        self._tipo_cb = combobox(bf, values=labels, textvariable=self._tipo_var)
+        self._tipo_cb.pack(fill='x', ipady=3, pady=(0, 12))
+        if self._conta and self._conta.tipo_contas in _CONTA_TIPOS:
+            self._tipo_cb.current(_CONTA_TIPOS.index(self._conta.tipo_contas))
+        else:
+            self._tipo_cb.current(0)
+
+        # Aviso sobre saldo: o backend não permite editar.
+        if self._conta is not None:
+            tk.Label(
+                bf,
+                text=f'Saldo atual: {formatar_brl(self._conta.saldo_contas)}\n'
+                     'O saldo é ajustado automaticamente pelas transações.',
+                bg=bg, fg=C.INK_4, font=(C.FONT_BODY, 9), justify='left',
+            ).pack(anchor='w', pady=(0, 4))
+
+        # Ações
+        button(self.footer_frame, 'Cancelar', command=self.destroy,
+               variant='ghost').pack(side='right', padx=(6, 16), pady=10)
+        button(self.footer_frame, 'Salvar', command=self._salvar,
+               variant='primary').pack(side='right', pady=10)
+
+    def _salvar(self) -> None:
+        nome = self._name_var.get().strip()
+        if not nome:
+            self._ao_erro('Nome da conta obrigatorio!')
+            return
+
+        idx = self._tipo_cb.current()
+        if idx < 0 or idx >= len(_CONTA_TIPOS):
+            self._ao_erro('Tipo de conta invalido!')
+            return
+        tipo = _CONTA_TIPOS[idx]
+
+        self._ao_salvar(nome, tipo)
         self.destroy()
