@@ -101,13 +101,13 @@ class Sidebar(tk.Frame):
                  font=(C.FONT_BODY, 8)).pack(anchor='w')
 
         # Sair da sessão atual.
-        lb = tk.Button(user_row, text='⇥', bg=C.SIDE_2, fg=C.SIDE_TEXT,
-                       bd=0, cursor='hand2', font=(C.FONT_BODY, 12),
-                       activebackground=C.SIDE_2, activeforeground='#ff8775',
-                       command=self._ao_sair, padx=4, pady=2)
+        lb = tk.Button(user_row, text='⇥  Sair', bg=C.SIDE_2, fg=C.SIDE_TEXT,
+                       bd=0, cursor='hand2', font=(C.FONT_BODY, 10, 'bold'),
+                       activebackground=C.SIDE_3, activeforeground='#ff8775',
+                       command=self._ao_sair, padx=8, pady=4)
         lb.pack(side='right')
-        lb.bind('<Enter>', lambda e: lb.config(fg='#ff8775'))
-        lb.bind('<Leave>', lambda e: lb.config(fg=C.SIDE_TEXT))
+        lb.bind('<Enter>', lambda e: lb.config(bg=C.SIDE_3, fg='#ff8775'))
+        lb.bind('<Leave>', lambda e: lb.config(bg=C.SIDE_2, fg=C.SIDE_TEXT))
 
     def _botao_lateral(self, parent: tk.Widget, item_id: str, label_text: str) -> tk.Button:
         is_active = item_id == self._active
