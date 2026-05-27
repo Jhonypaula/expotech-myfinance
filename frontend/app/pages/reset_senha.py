@@ -115,6 +115,12 @@ class ResetSenhaPage(tk.Frame):
         button(self._etapa2, 'Redefinir senha', command=self._aplicar_nova_senha,
                variant='primary', size='lg').pack(fill='x', pady=(4, 12))
 
+        # Faixa de erro inline; aparece quando a validação local ou do backend falha.
+        self._err_var = tk.StringVar(value='')
+        self._err_lbl = tk.Label(form_wrap, textvariable=self._err_var, bg=C.RED_50,
+                                 fg=C.RED, font=(C.FONT_BODY, 10), padx=8, pady=4,
+                                 wraplength=340, justify='left')
+
         # Volta para a tela de login.
         foot = tk.Frame(form_wrap, bg=C.SURFACE)
         foot.pack()
@@ -147,16 +153,17 @@ class ResetSenhaPage(tk.Frame):
 
         email = self._email_var.get().strip()
         if not email:
-            self._flash('error', 'Informe o e-mail')
+            self._exibir_erro('Informe o e-mail')
             return
 
         ok, msg = backend.requisicao_alterar_senha(email)
         if not ok:
-            self._flash('error', msg or 'Nao foi possivel enviar o e-mail')
+            self._exibir_erro(msg or 'Nao foi possivel enviar o e-mail')
             return
 
         # O backend sempre devolve True para nao revelar se o e-mail existe;
         # passamos a etapa 2 e deixamos o usuario validar o token recebido.
+        self._err_lbl.pack_forget()
         self._flash('success', 'Token enviado. Verifique sua caixa de entrada.')
         self._mostrar_etapa(2)
 
@@ -168,23 +175,28 @@ class ResetSenhaPage(tk.Frame):
         senha2 = self._pw2_var.get()
 
         if not token:
-            self._flash('error', 'Informe o token recebido por e-mail')
+            self._exibir_erro('Informe o token recebido por e-mail')
             return
         if not senha:
-            self._flash('error', 'Informe a nova senha')
+            self._exibir_erro('Informe a nova senha')
             return
         if senha != senha2:
-            self._flash('error', 'As senhas nao coincidem')
+            self._exibir_erro('As senhas nao coincidem')
             return
 
         ok, msg = backend.resetar_senha(token, senha)
         if not ok:
-            self._flash('error', msg or 'Nao foi possivel redefinir a senha')
+            self._exibir_erro(msg or 'Nao foi possivel redefinir a senha')
             return
 
+        self._err_lbl.pack_forget()
         self._flash('success', 'Senha redefinida com sucesso. Faca login.')
         self._limpar()
         self._ir_login()
+
+    def _exibir_erro(self, msg: str) -> None:
+        self._err_var.set(f'!  {msg}')
+        self._err_lbl.pack(fill='x', pady=(0, 10))
 
     def _voltar_login(self) -> None:
         self._limpar()
@@ -195,4 +207,5 @@ class ResetSenhaPage(tk.Frame):
         self._token_var.set('')
         self._pw_var.set('')
         self._pw2_var.set('')
+        self._err_lbl.pack_forget()
         self._mostrar_etapa(1)

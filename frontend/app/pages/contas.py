@@ -77,6 +77,12 @@ class ContasPage(BasePage):
         button(fi, '+ Criar Conta', command=self._enviar,
                variant='primary', size='lg').pack(fill='x', pady=(4, 0))
 
+        # Faixa de erro inline para o formulário de criação.
+        self._err_var = tk.StringVar(value='')
+        self._err_lbl = tk.Label(fi, textvariable=self._err_var, bg=C.RED_50,
+                                 fg=C.RED, font=(C.FONT_BODY, 10), padx=8, pady=4,
+                                 wraplength=240, justify='left')
+
         # Coluna da direita: contas já cadastradas.
         right = tk.Frame(self, bg=C.BG)
         right.grid(row=0, column=1, sticky='nsew', padx=(0, pad), pady=pad)
@@ -102,21 +108,36 @@ class ContasPage(BasePage):
     def _enviar(self) -> None:
         name = self._name_var.get().strip()
         if not name:
+            self._exibir_erro('Nome da conta obrigatorio!')
+            return
+
+        raw_balance = self._bal_var.get().strip()
+        if not raw_balance:
+            self._exibir_erro('Saldo inicial obrigatorio!')
             return
         try:
-            balance = float(self._bal_var.get().replace(',', '.'))
+            balance = float(raw_balance.replace(',', '.'))
         except ValueError:
-            balance = 0.0
+            self._exibir_erro('Saldo inicial deve ser um numero valido')
+            return
+        if balance < 0:
+            self._exibir_erro('Saldo inicial nao pode ser negativo')
+            return
 
         ok, msg = self._store.criar_conta(name, self._type_var.get(), balance)
         if not ok:
-            self._flash('error', msg or 'Nao foi possivel criar a conta')
+            self._exibir_erro(msg or 'Nao foi possivel criar a conta')
             return
 
+        self._err_lbl.pack_forget()
         self._flash('success', f'Conta "{name}" criada com sucesso')
         self._name_var.set('')
         self._bal_var.set('0')
         self._selecionar_tipo('corrente')
+
+    def _exibir_erro(self, msg: str) -> None:
+        self._err_var.set(f'!  {msg}')
+        self._err_lbl.pack(fill='x', pady=(8, 0))
 
     def _atualizar_lista(self) -> None:
         for w in self._cards_inner.winfo_children():
