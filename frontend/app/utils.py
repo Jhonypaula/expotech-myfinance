@@ -1,6 +1,7 @@
 """Formatação de dinheiro, datas e cores."""
 from __future__ import annotations
 from datetime import datetime
+import tkinter as tk
 
 
 def formatar_brl(amount: float) -> str:
@@ -30,6 +31,47 @@ def formatar_data_curta(iso_str: str) -> str:
         return dt.strftime('%d/%m')
     except ValueError:
         return iso_str
+
+
+def aplicar_mascara_data(var: tk.StringVar) -> None:
+    """Mantém o conteúdo de *var* no formato dd/mm/aaaa enquanto o usuário digita.
+
+    Aceita só dígitos (até 8) e insere as barras nas posições corretas.
+    Letras e caracteres inválidos são descartados silenciosamente.
+    Pode ser passada como callback de ``trace_add``::
+
+        var.trace_add('write', lambda *_: aplicar_mascara_data(var))
+    """
+    raw    = var.get()
+    digits = ''.join(c for c in raw if c.isdigit())[:8]
+
+    partes: list[str] = []
+    if digits[:2]:
+        partes.append(digits[:2])
+    if digits[2:4]:
+        partes.append(digits[2:4])
+    if digits[4:8]:
+        partes.append(digits[4:8])
+    formatado = '/'.join(partes)
+
+    # Só atualiza se mudou, evitando recursão infinita no trace.
+    if formatado != raw:
+        var.set(formatado)
+
+
+def parsear_data(value: str) -> tuple['datetime | None', bool]:
+    """Converte *value* (dd/mm/aaaa) em datetime.
+
+    Devolve ``(datetime, True)`` se válido, ``(None, True)`` se vazio,
+    ou ``(None, False)`` se o texto não bate com o formato esperado.
+    """
+    v = value.strip()
+    if not v:
+        return None, True
+    try:
+        return datetime.strptime(v, '%d/%m/%Y'), True
+    except ValueError:
+        return None, False
 
 
 def clarear(hex_color: str, amount: float) -> str:
