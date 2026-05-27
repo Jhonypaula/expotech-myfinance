@@ -15,6 +15,7 @@ class LoginPage(tk.Frame):
         ao_logar: Callable[[], None],
         ir_cadastro: Callable[[], None],
         flash: Callable[[str, str], None],
+        ir_reset_senha: Callable[[], None] | None = None,
         **kwargs,
     ) -> None:
         super().__init__(parent, bg=C.BG, **kwargs)
@@ -22,6 +23,7 @@ class LoginPage(tk.Frame):
         self._ao_logar = ao_logar
         self._ir_cadastro = ir_cadastro
         self._flash = flash
+        self._ir_reset_senha = ir_reset_senha or (lambda: None)
         self._montar()
 
     def _montar(self) -> None:
@@ -110,9 +112,11 @@ class LoginPage(tk.Frame):
                              command=self._alternar_senha)
         show_btn.pack(side='right', fill='y')
 
-        # Link visual; o fluxo de reset ainda não tem tela.
-        tk.Label(form_wrap, text='Esqueci minha senha', bg=C.SURFACE, fg=C.BLUE,
-                 font=(C.FONT_BODY, 9), cursor='hand2').pack(anchor='e', pady=(0, 18))
+        # Link que abre o fluxo de recuperação de senha.
+        forgot_lbl = tk.Label(form_wrap, text='Esqueci minha senha', bg=C.SURFACE, fg=C.BLUE,
+                              font=(C.FONT_BODY, 9), cursor='hand2')
+        forgot_lbl.pack(anchor='e', pady=(0, 18))
+        forgot_lbl.bind('<Button-1>', lambda e: self._ir_reset_senha())
 
         # Só aparece quando a validação falha.
         self._err_var = tk.StringVar(value='')

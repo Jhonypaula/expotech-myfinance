@@ -270,6 +270,30 @@ def excluir_transacao(
     return True, ""
 
 
+# Recuperação de senha
+
+
+def requisicao_alterar_senha(email: str) -> Tuple[bool, str]:
+    """Solicita o envio do e-mail com o token de redefinição."""
+    from services.resetar_senha_service import requisicao_alterar_senha as _req
+
+    result, msg = _chamar(_req, email)
+    if result is None:
+        # _chamar devolve None só em exceção; msg traz "Erro interno: ..."
+        return False, msg or "Nao foi possivel enviar o e-mail"
+    return True, ""
+
+
+def resetar_senha(token: str, nova_senha: str) -> Tuple[bool, str]:
+    """Aplica a nova senha usando o token recebido por e-mail."""
+    from services.resetar_senha_service import resetar_senha as _reset
+
+    result, msg = _chamar(_reset, token, nova_senha)
+    if not result:
+        return False, msg or "Token invalido ou expirado"
+    return True, ""
+
+
 # Dashboard
 
 

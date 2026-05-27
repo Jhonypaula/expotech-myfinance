@@ -9,6 +9,7 @@ from app.components.topbar import Topbar
 from app.components.flash_stack import FlashStack
 from app.pages.login import LoginPage
 from app.pages.cadastro import CadastroPage
+from app.pages.reset_senha import ResetSenhaPage
 from app.pages.dashboard import DashboardPage
 from app.pages.contas import ContasPage
 from app.pages.transacoes import TransacoesPage
@@ -79,6 +80,7 @@ class Application:
             ao_logar=lambda: self._entrar_app(),
             ir_cadastro=lambda: self._exibir_tela('cadastro'),
             flash=self._flash.show,
+            ir_reset_senha=lambda: self._exibir_tela('reset_senha'),
         )
         login.place(relx=0, rely=0, relwidth=1, relheight=1)
 
@@ -91,8 +93,16 @@ class Application:
         )
         cadastro.place(relx=0, rely=0, relwidth=1, relheight=1)
 
+        reset_senha = ResetSenhaPage(
+            self._auth_shell,
+            ir_login=lambda: self._exibir_tela('login'),
+            flash=self._flash.show,
+        )
+        reset_senha.place(relx=0, rely=0, relwidth=1, relheight=1)
+
         self._login_page = login
         self._cadastro_page = cadastro
+        self._reset_senha_page = reset_senha
 
     def _montar_paginas_app(self) -> None:
         def flash(kind: str, msg: str) -> None:
@@ -147,13 +157,15 @@ class Application:
         prev = self._current_screen
         self._current_screen = screen
 
-        if screen in ('login', 'cadastro'):
+        if screen in ('login', 'cadastro', 'reset_senha'):
             self._app_shell.place_forget()
             self._auth_shell.place(relx=0, rely=0, relwidth=1, relheight=1)
             if screen == 'login':
                 self._login_page.tkraise()
-            else:
+            elif screen == 'cadastro':
                 self._cadastro_page.tkraise()
+            else:
+                self._reset_senha_page.tkraise()
             return
 
         if not self._app_pages_built:
