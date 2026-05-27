@@ -54,9 +54,31 @@ class BaseModal(tk.Toplevel):
         self.body_frame   = tk.Frame(self, bg=C.SURFACE)
         self.body_frame.pack(fill='both', expand=True, padx=20, pady=12)
 
+        # Faixa de erro no topo do corpo: só aparece quando a validação falha.
+        self._err_var = tk.StringVar(value='')
+        self._err_lbl = tk.Label(
+            self.body_frame, textvariable=self._err_var,
+            bg=C.RED_50, fg=C.RED, font=(C.FONT_BODY, 10),
+            padx=10, pady=6, wraplength=420, justify='left', anchor='w',
+        )
+
         self.footer_frame = tk.Frame(self, bg=C.SURFACE,
                                      highlightthickness=1, highlightbackground=C.HAIRLINE)
         self.footer_frame.pack(fill='x', side='bottom')
+
+    def mostrar_erro(self, msg: str) -> None:
+        """Mostra uma faixa vermelha de erro no topo do corpo do modal."""
+        self._err_var.set(f'!  {msg}')
+        # `pack` na primeira posição garante que o aviso fica acima do formulário.
+        self._err_lbl.pack(fill='x', pady=(0, 10), before=self._primeiro_widget_corpo())
+
+    def limpar_erro(self) -> None:
+        self._err_lbl.pack_forget()
+
+    def _primeiro_widget_corpo(self) -> tk.Widget:
+        """Devolve o primeiro filho do corpo para usar como âncora do erro."""
+        filhos = [w for w in self.body_frame.winfo_children() if w is not self._err_lbl]
+        return filhos[0] if filhos else self.body_frame
 
 
 class TxModal(BaseModal):
@@ -180,6 +202,10 @@ class TxModal(BaseModal):
         self._type_var.set(kind)
         self._atualizar_toggle()
 
+    def _sinalizar_erro(self, msg: str) -> None:
+        self.mostrar_erro(msg)
+        self._ao_erro(msg)
+
     def _atualizar_toggle(self) -> None:
         if self._type_var.get() == 'entrada':
             self._btn_entrada.config(bg=C.GREEN_50,  fg=C.GREEN_700,
@@ -199,29 +225,29 @@ class TxModal(BaseModal):
     def _salvar(self) -> None:
         raw_amount = self._amount_var.get().strip()
         if not raw_amount:
-            self._ao_erro('O valor deve ser um número válido')
+            self._sinalizar_erro('O valor deve ser um número válido')
             return
         try:
             amount = float(raw_amount.replace(',', '.'))
         except ValueError:
-            self._ao_erro('O valor deve ser um número válido')
+            self._sinalizar_erro('O valor deve ser um número válido')
             return
         if amount <= 0:
-            self._ao_erro('O valor deve ser um número positivo')
+            self._sinalizar_erro('O valor deve ser um número positivo')
             return
 
         desc = self._desc_var.get().strip()
         if not desc:
-            self._ao_erro('Descricao obrigatoria!')
+            self._sinalizar_erro('Descricao obrigatoria!')
             return
         if len(desc) > 15:
-            self._ao_erro('Descricao muito longa! Maximo 15')
+            self._sinalizar_erro('Descricao muito longa! Maximo 15')
             return
 
         # Resolve a conta escolhida no combobox.
         acct_idx = self._acct_cb.current()
         if acct_idx < 0 or acct_idx >= len(self._accounts):
-            self._ao_erro('Selecione uma conta para a transacao')
+            self._sinalizar_erro('Selecione uma conta para a transacao')
             return
         conta_id = self._accounts[acct_idx].id_contas
 
@@ -303,15 +329,19 @@ class ContaModal(BaseModal):
         button(self.footer_frame, 'Salvar', command=self._salvar,
                variant='primary').pack(side='right', pady=10)
 
+    def _sinalizar_erro(self, msg: str) -> None:
+        self.mostrar_erro(msg)
+        self._ao_erro(msg)
+
     def _salvar(self) -> None:
         nome = self._name_var.get().strip()
         if not nome:
-            self._ao_erro('Nome da conta obrigatorio!')
+            self._sinalizar_erro('Nome da conta obrigatorio!')
             return
 
         idx = self._tipo_cb.current()
         if idx < 0 or idx >= len(_CONTA_TIPOS):
-            self._ao_erro('Tipo de conta invalido!')
+            self._sinalizar_erro('Tipo de conta invalido!')
             return
         tipo = _CONTA_TIPOS[idx]
 
