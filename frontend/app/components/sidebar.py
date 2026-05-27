@@ -92,15 +92,8 @@ class Sidebar(tk.Frame):
         tk.Label(av, text=user.nome_usuarios[0], bg=C.GREEN, fg='white',
                  font=(C.FONT_BODY, 11, 'bold')).pack(expand=True)
 
-        # Identificação da sessão.
-        col = tk.Frame(user_row, bg=C.SIDE_2)
-        col.pack(side='left', padx=(8, 0), fill='x', expand=True)
-        tk.Label(col, text=user.nome_usuarios, bg=C.SIDE_2, fg='#e6ecf4',
-                 font=(C.FONT_BODY, 10, 'bold')).pack(anchor='w')
-        tk.Label(col, text=user.email_usuarios, bg=C.SIDE_2, fg=C.SIDE_TEXT_2,
-                 font=(C.FONT_BODY, 8)).pack(anchor='w')
-
-        # Sair da sessão atual.
+        # Sair da sessão atual. Precisa ser empacotado antes do `col` para
+        # reservar o canto direito; senão `expand=True` engole toda a largura.
         lb = tk.Button(user_row, text='⇥  Sair', bg=C.SIDE_2, fg=C.SIDE_TEXT,
                        bd=0, cursor='hand2', font=(C.FONT_BODY, 10, 'bold'),
                        activebackground=C.SIDE_3, activeforeground='#ff8775',
@@ -108,6 +101,14 @@ class Sidebar(tk.Frame):
         lb.pack(side='right')
         lb.bind('<Enter>', lambda e: lb.config(bg=C.SIDE_3, fg='#ff8775'))
         lb.bind('<Leave>', lambda e: lb.config(bg=C.SIDE_2, fg=C.SIDE_TEXT))
+
+        # Identificação da sessão (entra entre o avatar e o botão de sair).
+        col = tk.Frame(user_row, bg=C.SIDE_2)
+        col.pack(side='left', padx=(8, 0), fill='x', expand=True)
+        tk.Label(col, text=user.nome_usuarios, bg=C.SIDE_2, fg='#e6ecf4',
+                 font=(C.FONT_BODY, 10, 'bold')).pack(anchor='w')
+        tk.Label(col, text=user.email_usuarios, bg=C.SIDE_2, fg=C.SIDE_TEXT_2,
+                 font=(C.FONT_BODY, 8)).pack(anchor='w')
 
     def _botao_lateral(self, parent: tk.Widget, item_id: str, label_text: str) -> tk.Button:
         is_active = item_id == self._active
