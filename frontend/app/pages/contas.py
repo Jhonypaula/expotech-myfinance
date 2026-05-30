@@ -226,13 +226,24 @@ class ContasPage(BasePage):
             self._flash('error', msg or 'Nao foi possivel atualizar a conta')
 
     def _excluir(self, id_contas: int, name: str) -> None:
-        if not messagebox.askyesno('Excluir conta', f'Excluir a conta "{name}"?'):
+        if not messagebox.askyesno('Excluir conta', f'Excluir a conta "{name}"?\n\nEsta ação não pode ser desfeita.'):
             return
         ok, msg = self._store.excluir_conta(id_contas)
         if ok:
             self._flash('success', f'Conta "{name}" excluida')
         else:
-            self._flash('error', msg or 'Nao foi possivel excluir a conta')
+            erro = msg or 'Não foi possível excluir a conta.'
+            # Detecta mensagem de FK / transações vinculadas e exibe popup claro.
+            if any(k in (msg or '').lower() for k in ('foreign', 'fk', 'transac', 'constraint', 'integrity')):
+                messagebox.showerror(
+                    'Conta com transações',
+                    f'A conta "{name}" não pode ser excluída\n'
+                    'porque possui transações vinculadas a ela.\n\n'
+                    'Exclua ou mova as transações antes de remover a conta.',
+                )
+            else:
+                messagebox.showerror('Erro ao excluir', erro)
+            self._flash('error', erro)
 
     def ao_exibir(self) -> None:
         self._atualizar_lista()
