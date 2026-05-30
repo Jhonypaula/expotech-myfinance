@@ -30,6 +30,8 @@ class BaseModal(tk.Toplevel):
         self.resizable(False, False)
         self.configure(bg=C.SURFACE)
         self.transient(parent)
+        self.update_idletasks()
+        self.wait_visibility()
         self.grab_set()
         self._centralizar(parent, width, height)
         self.bind('<Escape>', lambda e: self.destroy())

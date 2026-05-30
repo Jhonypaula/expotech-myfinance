@@ -94,7 +94,20 @@ class CadastroPage(tk.Frame):
                  font=(C.FONT_BODY, 10, 'bold')).pack(anchor='w', pady=(0, 4))
         self._pw_var = tk.StringVar()
         self._pw_var.trace_add('write', self._atualizar_forca)
-        entry(form_wrap, textvariable=self._pw_var, show='*').pack(fill='x', ipady=6, pady=(0, 4))
+        pw_row = tk.Frame(form_wrap, bg=C.SURFACE,
+                          highlightthickness=1, highlightbackground=C.HAIRLINE)
+        pw_row.pack(fill='x', pady=(0, 4))
+        self._pw_entry = entry(pw_row, textvariable=self._pw_var, show='*',
+                               highlightthickness=0)
+        self._pw_entry.pack(side='left', fill='x', expand=True, ipady=6)
+        self._show_pw = False
+        self._eye1_btn = tk.Button(
+            pw_row, text='👁', bg=C.SURFACE, fg=C.INK_3, bd=0,
+            cursor='hand2', font=(C.FONT_BODY, 11), padx=10,
+            relief='flat', activebackground=C.BG_2,
+            command=self._alternar_senha,
+        )
+        self._eye1_btn.pack(side='right', fill='y', padx=(0, 2))
 
         # Barrinhas do indicador de força.
         bars_frame = tk.Frame(form_wrap, bg=C.SURFACE)
@@ -113,8 +126,20 @@ class CadastroPage(tk.Frame):
                  font=(C.FONT_BODY, 10, 'bold')).pack(anchor='w', pady=(0, 4))
         self._pw2_var = tk.StringVar()
         self._pw2_var.trace_add('write', self._verificar_match)
-        self._pw2_entry = entry(form_wrap, textvariable=self._pw2_var, show='*')
-        self._pw2_entry.pack(fill='x', ipady=6, pady=(0, 4))
+        pw2_row = tk.Frame(form_wrap, bg=C.SURFACE,
+                           highlightthickness=1, highlightbackground=C.HAIRLINE)
+        pw2_row.pack(fill='x', pady=(0, 4))
+        self._pw2_entry = entry(pw2_row, textvariable=self._pw2_var, show='*',
+                                highlightthickness=0)
+        self._pw2_entry.pack(side='left', fill='x', expand=True, ipady=6)
+        self._eye2_btn = tk.Button(
+            pw2_row, text='👁', bg=C.SURFACE, fg=C.INK_3, bd=0,
+            cursor='hand2', font=(C.FONT_BODY, 11), padx=10,
+            relief='flat', activebackground=C.BG_2,
+            command=self._alternar_confirmacao,
+        )
+        self._eye2_btn.pack(side='right', fill='y', padx=(0, 2))
+        self._show_pw2 = False
         self._mismatch_lbl = tk.Label(form_wrap, text='!  As senhas nao coincidem',
                                       bg=C.RED_50, fg=C.RED, font=(C.FONT_BODY, 9), padx=6, pady=3)
 
@@ -137,6 +162,16 @@ class CadastroPage(tk.Frame):
                         font=(C.FONT_BODY, 10, 'bold'), cursor='hand2')
         link.pack(side='left')
         link.bind('<Button-1>', lambda e: self._ir_login())
+
+    def _alternar_senha(self) -> None:
+        self._show_pw = not self._show_pw
+        self._pw_entry.configure(show='' if self._show_pw else '*')
+        self._eye1_btn.configure(text='🙈' if self._show_pw else '👁')
+
+    def _alternar_confirmacao(self) -> None:
+        self._show_pw2 = not self._show_pw2
+        self._pw2_entry.configure(show='' if self._show_pw2 else '*')
+        self._eye2_btn.configure(text='🙈' if self._show_pw2 else '👁')
 
     def _atualizar_forca(self, *_) -> None:
         pw = self._pw_var.get()
