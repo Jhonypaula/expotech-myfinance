@@ -69,6 +69,7 @@ class TxTable(tk.Frame):
             style='Finance.Treeview',
             yscrollcommand=sb.set,
             selectmode='browse',
+            cursor='hand2',
         )
         sb.config(command=self._tree.yview)
 

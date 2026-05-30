@@ -155,6 +155,7 @@ class TransacoesPage(BasePage):
             )
             if ok:
                 self._flash('success', 'Transacao atualizada')
+                self.after(100, self._atualizar)
             else:
                 self._flash('error', msg or 'Nao foi possivel atualizar a transacao')
         else:
@@ -168,6 +169,7 @@ class TransacoesPage(BasePage):
             if ok:
                 kind = 'Entrada' if draft.tipo_transacoes == 'entrada' else 'Saida'
                 self._flash('success', f'{kind} registrada: {draft.descricao_transacoes}')
+                self.after(100, self._atualizar)
             else:
                 self._flash('error', msg or 'Nao foi possivel registrar a transacao')
 
