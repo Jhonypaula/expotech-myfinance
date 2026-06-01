@@ -1,0 +1,3 @@
+python-dotenv
+mysql-connector-python
+matplotlib>=3.7.0
