@@ -2,6 +2,12 @@ import mysql.connector
 
 from dotenv import load_dotenv
 import os
+import pathlib
+
+root = pathlib.Path(__file__).parent.parent
+env_path = root / '.env'
+
+load_dotenv(dotenv_path=env_path)
 
 load_dotenv() 
 
