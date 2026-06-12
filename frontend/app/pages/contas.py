@@ -218,12 +218,14 @@ class ContasPage(BasePage):
             ao_erro=lambda msg: self._flash('error', msg),
         )
 
-    def _aplicar_edicao(self, id_contas: int, nome: str, tipo: str) -> None:
+    def _aplicar_edicao(self, id_contas: int, nome: str, tipo: str) -> tuple[bool, str]:
         ok, msg = self._store.editar_conta(id_contas, nome, tipo)
         if ok:
             self._flash('success', f'Conta "{nome}" atualizada')
-        else:
-            self._flash('error', msg or 'Nao foi possivel atualizar a conta')
+            return True, ''
+
+        self._flash('error', msg or 'Nao foi possivel atualizar a conta')
+        return False, msg or 'Nao foi possivel atualizar a conta'
 
     def _excluir(self, id_contas: int, name: str) -> None:
         if not messagebox.askyesno('Excluir conta', f'Excluir a conta "{name}"?\n\nEsta ação não pode ser desfeita.'):

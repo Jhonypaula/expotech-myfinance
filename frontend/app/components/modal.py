@@ -397,7 +397,7 @@ class ContaModal(BaseModal):
     def __init__(
         self,
         parent: tk.Widget,
-        ao_salvar: Callable[[str, str], None],
+        ao_salvar: Callable[[str, str], tuple[bool, str]],
         conta: Optional[Account] = None,
         ao_erro: Optional[Callable[[str], None]] = None,
     ) -> None:
@@ -464,5 +464,8 @@ class ContaModal(BaseModal):
             return
         tipo = _CONTA_TIPOS[idx]
 
-        self._ao_salvar(nome, tipo)
-        self.destroy()
+        ok, msg = self._ao_salvar(nome, tipo)
+        if ok:
+            self.destroy()
+        else:
+            self._sinalizar_erro(msg or 'Nao foi possivel salvar a conta')

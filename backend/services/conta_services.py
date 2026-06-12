@@ -127,6 +127,20 @@ def editar_conta_service(
         if not conta_existente:
             print("\nConta nao encontrada ou nao pertence ao usuario")
             return None
+        
+        conta_mesmo_nome = buscar_conta_por_nome(
+            usuario_id,
+            novo_nome
+        )
+
+        if (
+            conta_mesmo_nome and
+            conta_mesmo_nome[0] != id_conta
+        ):
+            print(
+                "\nJa existe uma conta com esse nome"
+            )
+            return None
 
         editar_conta_repository(
             usuario_id,
