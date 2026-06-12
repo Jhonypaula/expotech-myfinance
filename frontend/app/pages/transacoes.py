@@ -141,7 +141,7 @@ class TransacoesPage(BasePage):
                 ao_salvar=self._salvar_transacao, tx=tx,
                 ao_erro=lambda msg: self._flash('error', msg))
 
-    def _salvar_transacao(self, draft) -> None:
+    def _salvar_transacao(self, draft) -> tuple[bool, str]:
         """Recebe o rascunho do modal e decide entre criar ou editar."""
         is_edit = draft.id_transacoes != 0
         if is_edit:
@@ -156,22 +156,25 @@ class TransacoesPage(BasePage):
             if ok:
                 self._flash('success', 'Transacao atualizada')
                 self.after(100, self._atualizar)
-            else:
-                self._flash('error', msg or 'Nao foi possivel atualizar a transacao')
-        else:
-            ok, msg = self._store.criar_transacao(
-                conta_id=draft.conta_id,
-                categoria_id=draft.categoria_id,
-                tipo=draft.tipo_transacoes,
-                valor=draft.valor_transacoes,
-                descricao=draft.descricao_transacoes,
-            )
-            if ok:
-                kind = 'Entrada' if draft.tipo_transacoes == 'entrada' else 'Saida'
-                self._flash('success', f'{kind} registrada: {draft.descricao_transacoes}')
-                self.after(100, self._atualizar)
-            else:
-                self._flash('error', msg or 'Nao foi possivel registrar a transacao')
+                return True, ''
+            self._flash('error', msg or 'Nao foi possivel atualizar a transacao')
+            return False, msg or 'Nao foi possivel atualizar a transacao'
+
+        ok, msg = self._store.criar_transacao(
+            conta_id=draft.conta_id,
+            categoria_id=draft.categoria_id,
+            tipo=draft.tipo_transacoes,
+            valor=draft.valor_transacoes,
+            descricao=draft.descricao_transacoes,
+        )
+        if ok:
+            kind = 'Entrada' if draft.tipo_transacoes == 'entrada' else 'Saida'
+            self._flash('success', f'{kind} registrada: {draft.descricao_transacoes}')
+            self.after(100, self._atualizar)
+            return True, ''
+
+        self._flash('error', msg or 'Nao foi possivel registrar a transacao')
+        return False, msg or 'Nao foi possivel registrar a transacao'
 
     def _excluir_transacao_handler(self, tx) -> None:
         if not messagebox.askyesno('Excluir transacao', 'Excluir esta transacao?'):

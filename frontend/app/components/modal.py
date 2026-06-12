@@ -384,8 +384,12 @@ class TxModal(BaseModal):
             descricao_transacoes = desc,
             data_transacao       = data_iso,
         )
-        self._ao_salvar(draft)
-        self.destroy()
+        ok, msg = self._ao_salvar(draft)
+
+        if ok:
+            self.destroy()
+        else:
+            self._sinalizar_erro(msg)
 
 class ContaModal(BaseModal):
     """Formulário de edição de conta (apenas nome e tipo são editáveis)."""

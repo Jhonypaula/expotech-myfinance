@@ -119,7 +119,10 @@ def criar_transacao_service(
             
         else:
             if valor_transacao > saldo_atual:
-                print("\nSaldo insuficiente!")
+                print(
+                    f"\nSaldo insuficiente!"
+                    f"\nDisponivel: R$ {saldo_atual:.2f}"
+                )
                 return None
             
             novo_saldo = saldo_atual - valor_transacao
@@ -327,7 +330,10 @@ def editar_transacao_service(
 
         else:
             if valor_transacao > saldo_atual:
-                print("\nSaldo insuficiente!")
+                print(
+                    f"\nSaldo insuficiente!"
+                    f"\nDisponivel: R$ {saldo_atual:.2f}"
+                )
                 return None
             
             novo_saldo = saldo_atual - valor_transacao
