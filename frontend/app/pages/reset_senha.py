@@ -103,14 +103,41 @@ class ResetSenhaPage(tk.Frame):
         tk.Label(self._etapa2, text='Nova senha *', bg=C.SURFACE, fg=C.INK_3,
                  font=(C.FONT_BODY, 10, 'bold')).pack(anchor='w', pady=(0, 4))
         self._pw_var = tk.StringVar()
-        entry(self._etapa2, textvariable=self._pw_var, show='*').pack(
-            fill='x', ipady=6, pady=(0, 10))
+        self._pw_visible = False
+        pw_row = tk.Frame(self._etapa2, bg=C.SURFACE)
+        pw_row.pack(fill='x', pady=(0, 10))
+        pw_row.columnconfigure(0, weight=1)
+        self._pw_entry = entry(pw_row, textvariable=self._pw_var, show='*')
+        self._pw_entry.grid(row=0, column=0, sticky='ew', ipady=6)
+        self._pw_eye_btn = tk.Button(
+            pw_row, text='👁', bg=C.SURFACE, fg=C.INK_3,
+            relief='flat', bd=0, cursor='hand2',
+            font=(C.FONT_BODY, 12),
+            activebackground=C.BG_2, activeforeground=C.INK,
+            command=self._toggle_pw,
+        )
+        self._pw_eye_btn.grid(row=0, column=1, padx=(6, 0))
 
         tk.Label(self._etapa2, text='Confirmar nova senha *', bg=C.SURFACE, fg=C.INK_3,
                  font=(C.FONT_BODY, 10, 'bold')).pack(anchor='w', pady=(0, 4))
         self._pw2_var = tk.StringVar()
-        entry(self._etapa2, textvariable=self._pw2_var, show='*').pack(
-            fill='x', ipady=6, pady=(0, 12))
+        self._pw2_visible = False
+        pw2_row = tk.Frame(self._etapa2, bg=C.SURFACE)
+        pw2_row.pack(fill='x', pady=(0, 12))
+        pw2_row.columnconfigure(0, weight=1)
+        _pw2 = entry(pw2_row, textvariable=self._pw2_var)
+        _pw2.config(show='*')
+        _pw2.grid(row=0, column=0, sticky='ew', ipady=6)
+        self._pw2_entry = _pw2
+        self._pw2_eye_btn = tk.Button(
+            pw2_row, text='\U0001f441', bg=C.SURFACE, fg=C.INK_3,
+            relief='flat', bd=0, cursor='hand2',
+            font=(C.FONT_BODY, 12),
+            activebackground=C.BG_2, activeforeground=C.INK,
+            padx=4, pady=0,
+            command=self._toggle_pw2,
+        )
+        self._pw2_eye_btn.grid(row=0, column=1, padx=(6, 0), sticky='ns')
 
         button(self._etapa2, 'Redefinir senha', command=self._aplicar_nova_senha,
                variant='primary', size='lg').pack(fill='x', pady=(4, 12))
@@ -132,6 +159,16 @@ class ResetSenhaPage(tk.Frame):
         link.bind('<Button-1>', lambda e: self._voltar_login())
 
         self._mostrar_etapa(1)
+
+    def _toggle_pw(self) -> None:
+        self._pw_visible = not self._pw_visible
+        self._pw_entry.config(show='' if self._pw_visible else '*')
+        self._pw_eye_btn.config(fg=C.GREEN if self._pw_visible else C.INK_3)
+
+    def _toggle_pw2(self) -> None:
+        self._pw2_visible = not self._pw2_visible
+        self._pw2_entry.config(show='' if self._pw2_visible else '*')
+        self._pw2_eye_btn.config(fg=C.GREEN if self._pw2_visible else C.INK_3)
 
     def _mostrar_etapa(self, n: int) -> None:
         self._etapa = n
@@ -207,5 +244,12 @@ class ResetSenhaPage(tk.Frame):
         self._token_var.set('')
         self._pw_var.set('')
         self._pw2_var.set('')
+        # Oculta as senhas e restaura o visual dos botoes
+        self._pw_visible = False
+        self._pw_entry.config(show='*')
+        self._pw_eye_btn.config(fg=C.INK_3)
+        self._pw2_visible = False
+        self._pw2_entry.config(show='*')
+        self._pw2_eye_btn.config(fg=C.INK_3)
         self._err_lbl.pack_forget()
         self._mostrar_etapa(1)
