@@ -286,8 +286,8 @@ class TxModal(BaseModal):
 
         cat_col = tk.Frame(two, bg=bg)
         cat_col.grid(row=0, column=1, sticky='ew', padx=(6, 0))
-        field_label(cat_col, 'Categoria', bg)
-        cat_labels = ['— Nenhuma —'] + [c.nome_categorias for c in self._categories]
+        field_label(cat_col, 'Categoria *', bg)
+        cat_labels = [c.nome_categorias for c in self._categories]
         self._cat_var = tk.StringVar()
         self._cat_cb  = combobox(cat_col, values=cat_labels, textvariable=self._cat_var)
         self._cat_cb.pack(fill='x', ipady=3)
@@ -365,8 +365,15 @@ class TxModal(BaseModal):
 
         cat_idx = self._cat_cb.current()
         categoria_id: Optional[int] = None
-        if cat_idx > 0:
-            categoria_id = self._categories[cat_idx - 1].id_categorias
+        if cat_idx < 0:
+            self._sinalizar_erro(
+                "Selecione uma categoria"
+            )
+            return
+
+        categoria_id = self._categories[
+            cat_idx
+        ].id_categorias
 
         draft = Transaction(
             id_transacoes        = self._tx.id_transacoes if self._tx else 0,
